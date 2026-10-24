@@ -593,35 +593,20 @@ function render() {
 })();
 </script>
 <script>
-// Rellenado por el workflow de despliegue (sed). En local queda como "dev".
-var BUILD = { sha: "dev", date: "" };
+// Versión: el build (scripts/version.js) sustituye estas constantes. Sin sellar (abrir index.html directamente) = desarrollo.
+var APP_VERSION = "dev";
+var APP_BUILD = { sha: "", date: "" };
 (function () {
   var el = document.getElementById("buildinfo");
   if (!el) return;
-  function show(sha, iso, derived) {
-    var d = iso ? new Date(iso) : null, ok = d && !isNaN(d);
-    el.textContent = "v " + sha + (ok ? " · " + d.toISOString().slice(0, 16).replace("T", " ") + " UTC" : "");
-    el.title = (sha === "dev" ? "Build local (sin desplegar)" : "Commit " + sha + (iso ? " · " + iso : "")) + (derived ? " (leído del service worker)" : "");
-  }
-  show(BUILD.sha, BUILD.date, false);
-  // Respaldo si el workflow no estampó la página: el hash sale del nombre de la caché del service worker
-  // y la fecha de la cabecera Last-Modified de sw.js (hora del despliegue).
-  var host = location.hostname;
-  if (BUILD.sha === "dev" && /^https?:$/.test(location.protocol) && host !== "localhost" && host !== "127.0.0.1" && window.caches) {
-    caches.keys().then(function (keys) {
-      var k = keys.filter(function (n) { return /^desarrollos-[0-9a-f]{7}$/.test(n); })[0];
-      if (!k) return;
-      var sha = k.slice(12);
-      show(sha, "", true);
-      return fetch("sw.js", { cache: "no-store" }).then(function (r) {
-        var lm = r.headers.get("last-modified"); if (lm) show(sha, new Date(lm).toISOString(), true);
-      });
-    }).catch(function () {});
-  }
+  if (APP_VERSION === "dev") { el.textContent = "desarrollo"; el.title = "Build local sin sellar"; return; }
+  el.textContent = "v" + APP_VERSION + " · build " + APP_BUILD.sha + " · " + APP_BUILD.date;
+  el.title = "Versión " + APP_VERSION + " · commit " + APP_BUILD.sha + " · " + APP_BUILD.date;
 })();
 </script>
 <script>
-if ("serviceWorker" in navigator) {
+// Dentro del APK (Capacitor) no se registra el service worker: la web ya viaja empaquetada.
+if ("serviceWorker" in navigator && !window.Capacitor) {
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("sw.js").catch(function () {});
   });

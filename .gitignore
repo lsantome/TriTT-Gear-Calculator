@@ -1,0 +1,22 @@
+# Dependencias y salidas de compilación
+node_modules/
+dist/
+www/
+build/
+.gradle/
+*.log
+
+# Firma y secretos: NUNCA al repositorio
+*.keystore
+*.jks
+*.p12
+keystore.properties
+local.properties
+
+# Binarios
+*.apk
+*.aab
+
+# Editores y sistema
+.idea/
+.DS_Store

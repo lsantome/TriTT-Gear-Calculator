@@ -1,0 +1,68 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Dependencias
+        run: npm ci
+
+      - name: Pruebas
+        run: npm test
+
+      - name: Generar el sitio (dist/site)
+        run: npm run build:pwa
+
+      - name: Comprobaciones del sitio
+        run: |
+          for f in index.html manifest.webmanifest sw.js fonts/fonts.css icons/icon-192.png icons/icon-512.png; do
+            test -s "dist/site/$f" || { echo "::error::Falta dist/site/$f"; exit 1; }
+          done
+          node --check dist/site/sw.js
+          node -e "const m=JSON.parse(require('fs').readFileSync('dist/site/manifest.webmanifest','utf8')); if(!m.id||!m.name||!m.start_url) process.exit(1)"
+          VERSION="$(node -p "require('./package.json').version")"
+          grep -q "var APP_VERSION = \"${VERSION}\";" dist/site/index.html
+          grep -q "const CACHE = \"desarrollos-${GITHUB_SHA::7}\";" dist/site/sw.js
+
+      - name: Subir el sitio (solo en main)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/site
+
+  deploy:
+    # Solo main despliega; las PR y las ramas ejecutan todo lo anterior sin publicar.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

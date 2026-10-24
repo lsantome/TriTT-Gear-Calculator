@@ -1,0 +1,112 @@
+name: Android
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Dependencias
+        run: npm ci
+
+      - name: Seguridad - ningún keystore versionado
+        run: |
+          if git ls-files | grep -Ei '\.(keystore|jks)$|keystore\.properties'; then
+            echo "::error::Hay un keystore o keystore.properties versionado. Retíralo del repositorio."
+            exit 1
+          fi
+
+      - name: La etiqueta coincide con package.json
+        if: github.ref_type == 'tag'
+        run: |
+          EXPECTED="v$(node -p "require('./package.json').version")"
+          if [ "$EXPECTED" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::La etiqueta $GITHUB_REF_NAME no coincide con package.json ($EXPECTED)."
+            exit 1
+          fi
+
+      - name: Pruebas
+        run: npm test
+
+      - name: Web del APK y Capacitor
+        run: npm run android:sync
+
+      - name: Compilar (firmado si hay secretos; si no, depuración)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          NAME="TriTT-Gear-Calculator-${VERSION}"
+          mkdir -p out
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_ALIAS" ] && [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/release.keystore"
+            node scripts/gradle.mjs assembleRelease bundleRelease
+            cp android/app/build/outputs/apk/release/app-release.apk "out/${NAME}.apk"
+            cp android/app/build/outputs/bundle/release/app-release.aab "out/${NAME}.aab"
+            "${ANDROID_HOME}/build-tools/36.0.0/apksigner" verify "out/${NAME}.apk"
+            rm -f "$RUNNER_TEMP/release.keystore"
+          else
+            echo "::warning::Faltan los secretos de firma (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD). Se genera un APK de DEPURACIÓN: no sirve para publicar."
+            node scripts/gradle.mjs assembleDebug
+            cp android/app/build/outputs/apk/debug/app-debug.apk "out/${NAME}-debug.apk"
+          fi
+          ls -l out
+
+      - name: Subir binarios como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-binaries
+          path: out/*
+          if-no-files-found: error
+
+  release:
+    # Solo con etiqueta v*: adjunta los binarios a la Release de GitHub.
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Descargar binarios
+        uses: actions/download-artifact@v4
+        with:
+          name: android-binaries
+          path: out
+
+      - name: Crear la Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          FLAGS=""
+          if ls out | grep -q -- '-debug\.apk$'; then FLAGS="--prerelease"; fi
+          gh release create "$GITHUB_REF_NAME" out/* --title "$GITHUB_REF_NAME" --generate-notes --verify-tag $FLAGS

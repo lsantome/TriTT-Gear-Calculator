@@ -1,0 +1,23 @@
+{
+  "name": "tritt-gear-calculator",
+  "version": "1.0.0",
+  "description": "Calculadora de desarrollos para triatlón y contrarreloj (PWA + Android con Capacitor)",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "build:pwa": "node scripts/build-pwa.js site",
+    "build:android-web": "node scripts/build-pwa.js app",
+    "android:sync": "npm run build:android-web && npx cap sync android",
+    "android:debug": "npm run android:sync && node scripts/gradle.mjs assembleDebug",
+    "android:release": "npm run android:sync && node scripts/gradle.mjs assembleRelease bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/cli": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  }
+}

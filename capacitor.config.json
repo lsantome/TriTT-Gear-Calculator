@@ -1,0 +1,6 @@
+{
+  "appId": "io.github.lsantome.trittgears",
+  "appName": "Desarrollos",
+  "webDir": "dist/app",
+  "android": { "allowMixedContent": false }
+}

@@ -1,0 +1,89 @@
+apply plugin: 'com.android.application'
+
+import groovy.json.JsonSlurper
+
+// Versión única: package.json -> version (semver). versionName = version.
+// versionCode = OFFSET + major*10000 + minor*100 + patch. El desplazamiento de 30.000.000 garantiza que
+// supera a cualquier código previo basado en minutos desde 1970 (~29,9 M en octubre de 2026). No lo reduzcas.
+def pkg = new JsonSlurper().parse(file('../../package.json'))
+def vParts = pkg.version.tokenize('.').collect { it.toInteger() }
+def VERSION_CODE_OFFSET = 30000000
+
+// Firma de release: SOLO desde variables de entorno o un keystore.properties ignorado por Git.
+// Sin ellas, assembleRelease/bundleRelease generan binarios SIN FIRMAR.
+def ksProps = new Properties()
+def ksFile = file('../../keystore.properties')
+if (ksFile.exists()) { ksFile.withInputStream { ksProps.load(it) } }
+def ksPath    = System.getenv('ANDROID_KEYSTORE_PATH')     ?: ksProps.getProperty('storeFile')
+def ksPass    = System.getenv('ANDROID_KEYSTORE_PASSWORD') ?: ksProps.getProperty('storePassword')
+def ksAlias   = System.getenv('ANDROID_KEY_ALIAS')         ?: ksProps.getProperty('keyAlias')
+def ksKeyPass = System.getenv('ANDROID_KEY_PASSWORD')      ?: ksProps.getProperty('keyPassword')
+def hasSigning = ksPath && ksPass && ksAlias && ksKeyPass && file(ksPath).exists()
+
+android {
+    namespace = "io.github.lsantome.trittgears"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "io.github.lsantome.trittgears"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode = VERSION_CODE_OFFSET + vParts[0] * 10000 + vParts[1] * 100 + vParts[2]
+        versionName = pkg.version
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        if (hasSigning) {
+            release {
+                storeFile file(ksPath)
+                storePassword ksPass
+                keyAlias ksAlias
+                keyPassword ksKeyPass
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (hasSigning) {
+                signingConfig signingConfigs.release
+            } else {
+                logger.warn('AVISO: sin credenciales de firma; el binario release saldrá SIN FIRMAR.')
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
