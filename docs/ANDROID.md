@@ -77,7 +77,9 @@ Sin los cuatro, `android.yml` genera un APK de **depuración**, lo avisa en el l
 
 1. Edita `version` en `package.json` y añade la entrada en `CHANGELOG.md`.
 2. `git commit` y merge a `main` (despliega la PWA).
-3. `git tag vX.Y.Z` (debe coincidir con `package.json`; el CI falla si no) y `git push origin vX.Y.Z`.
+3. Crea la etiqueta `vX.Y.Z` (debe coincidir con `package.json`; el CI falla si no), de una de estas dos formas:
+   - Por consola: `git tag vX.Y.Z` y `git push origin vX.Y.Z`. El workflow crea la Release.
+   - Desde la web: *Releases → Draft a new release → Choose a tag → escribe `vX.Y.Z` → Create new tag on publish* (destino `main`), pon título y notas y publícala. El workflow se lanza con la etiqueta y **adjunta APK y AAB a esa Release** (no hace falta subirlos a mano).
 4. `android.yml` compila, firma, verifica el APK con `apksigner` y adjunta APK y AAB a la Release. También puedes lanzarlo a mano (*Actions → Android → Run workflow*): sube los binarios como artefacto sin crear Release.
 
 ## Google Play
