@@ -58,3 +58,27 @@ test("ficha de Play: textos dentro de los límites de Google (30 / 80 / 4000)", 
     if (kind === "corta") assert.doesNotMatch(body, /\p{Extended_Pictographic}/u, `${tag}: sin emojis`);
   }
 });
+
+test("gráficos de Play: dimensiones y formato (PNG sin transparencia salvo el icono)", () => {
+  const dir = path.join(ROOT, "docs", "play-store", "graficos");
+  const dims = (f) => {
+    const b = fs.readFileSync(path.join(dir, f));
+    assert.equal(b.subarray(1, 4).toString(), "PNG", `${f} no es PNG`);
+    return { w: b.readUInt32BE(16), h: b.readUInt32BE(20), colorType: b[25], size: b.length };
+  };
+  const icon = dims("icono-512.png");
+  assert.deepEqual([icon.w, icon.h], [512, 512]);
+  assert.ok(icon.size <= 1024 * 1024, "el icono supera 1024 KB");
+  for (const l of ["es", "en"]) {
+    const g = dims(`grafico-funciones-${l}.png`);
+    assert.deepEqual([g.w, g.h], [1024, 500]);
+    assert.notEqual(g.colorType, 6, "el gráfico de funciones no puede tener canal alfa");
+    const caps = fs.readdirSync(dir).filter((f) => f.startsWith(`captura-${l}-`));
+    assert.ok(caps.length >= 4, `al menos 4 capturas en ${l}`);
+    for (const f of caps) {
+      const c = dims(f);
+      assert.deepEqual([c.w, c.h], [1080, 1920], f);
+      assert.notEqual(c.colorType, 6, `${f} no puede tener canal alfa`);
+    }
+  }
+});
