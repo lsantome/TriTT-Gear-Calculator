@@ -45,3 +45,16 @@ test("privacidad.html: bilingüe, sin recursos externos y publicada en el sitio"
 test("README: enlaza la política de privacidad publicada", () => {
   assert.ok(read("README.md").includes("https://lsantome.github.io/TriTT-Gear-Calculator/privacidad.html"));
 });
+
+test("ficha de Play: textos dentro de los límites de Google (30 / 80 / 4000)", () => {
+  const txt = read("docs/play-store/ficha.md");
+  const blocks = [...txt.matchAll(/```([\w-]+)\n([\s\S]*?)```/g)].map((m) => [m[1], m[2].replace(/\n$/, "")]);
+  const limits = { nombre: 30, corta: 80, larga: 4000 };
+  assert.equal(blocks.length, 6, "se esperan 6 bloques: nombre, corta y larga en es y en");
+  for (const [tag, body] of blocks) {
+    const [kind] = tag.split("-");
+    assert.ok(limits[kind], `bloque desconocido ${tag}`);
+    assert.ok([...body].length <= limits[kind], `${tag}: ${[...body].length} > ${limits[kind]}`);
+    if (kind === "corta") assert.doesNotMatch(body, /\p{Extended_Pictographic}/u, `${tag}: sin emojis`);
+  }
+});
