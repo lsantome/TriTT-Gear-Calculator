@@ -13,7 +13,8 @@ if (target !== "site" && target !== "app") {
 }
 
 const info = getVersionInfo();
-const out = path.join(ROOT, "dist", target);
+// BUILD_OUT_DIR permite compilar en otra carpeta (las pruebas usan una temporal propia: si dos compilan a la vez en dist/ se pisan).
+const out = path.join(process.env.BUILD_OUT_DIR ? path.resolve(process.env.BUILD_OUT_DIR) : path.join(ROOT, "dist"), target);
 const files = ["index.html", "manifest.webmanifest", "fonts", "icons"].concat(target === "site" ? ["sw.js", "privacidad.html"] : []);
 
 fs.rmSync(out, { recursive: true, force: true });
@@ -30,4 +31,4 @@ if (target === "site") {
   const sw = path.join(out, "sw.js");
   fs.writeFileSync(sw, stampSw(fs.readFileSync(sw, "utf8"), info));
 }
-console.log(`dist/${target}: v${info.version} · build ${info.sha} · ${info.date}`);
+console.log(`${path.relative(ROOT, out) || out}: v${info.version} · build ${info.sha} · ${info.date}`);

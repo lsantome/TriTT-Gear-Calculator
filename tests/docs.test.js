@@ -4,7 +4,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { ROOT, read } = require("./helpers.js");
+const { ROOT, read, buildTo } = require("./helpers.js");
 
 const pkg = JSON.parse(read("package.json"));
 
@@ -35,11 +35,10 @@ test("privacidad.html: bilingüe, sin recursos externos y publicada en el sitio"
   assert.doesNotMatch(html, /@import|url\(\s*["']?https?:/i);
   assert.doesNotMatch(html, /\[(?:TU|YOUR)[^\]]*\]/i, "quedan marcadores de relleno");
   // El build del sitio la incluye y el del APK no.
-  const { execFileSync } = require("node:child_process");
-  const run = (t) => execFileSync(process.execPath, [path.join(ROOT, "scripts", "build-pwa.js"), t], { cwd: ROOT, encoding: "utf8" });
-  run("site"); run("app");
-  assert.ok(fs2.existsSync(path.join(ROOT, "dist", "site", "privacidad.html")));
-  assert.ok(!fs2.existsSync(path.join(ROOT, "dist", "app", "privacidad.html")));
+  const out = buildTo();
+  assert.ok(fs2.existsSync(path.join(out, "site", "privacidad.html")));
+  assert.ok(!fs2.existsSync(path.join(out, "app", "privacidad.html")));
+  fs2.rmSync(out, { recursive: true, force: true });
 });
 
 test("README: enlaza la política de privacidad publicada", () => {

@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const { execFileSync } = require("node:child_process");
-const { ROOT, read } = require("./helpers.js");
+const { ROOT, read, buildTo } = require("./helpers.js");
 
 const html = read("index.html");
 const sw = read("sw.js");
@@ -115,19 +115,18 @@ test("package.json: scripts del estándar y campos obligatorios", () => {
 
 // Build y sellado de versión
 test("build: build:pwa y build:android-web sellan la versión; el APK no lleva service worker", () => {
-  const run = (t) => execFileSync(process.execPath, [path.join(ROOT, "scripts", "build-pwa.js"), t], { cwd: ROOT, encoding: "utf8" });
-  run("site");
-  run("app");
-  const site = (f) => fs.readFileSync(path.join(ROOT, "dist", "site", f), "utf8");
-  const app = (f) => fs.readFileSync(path.join(ROOT, "dist", "app", f), "utf8");
+  const out = buildTo();
+  const site = (f) => fs.readFileSync(path.join(out, "site", f), "utf8");
+  const app = (f) => fs.readFileSync(path.join(out, "app", f), "utf8");
   for (const h of [site("index.html"), app("index.html")]) {
     assert.ok(h.includes(`var APP_VERSION = "${pkg.version}";`));
     assert.match(h, /var APP_BUILD = \{ sha: "[0-9a-z-]+", date: "\d{4}-\d{2}-\d{2}" \};/);
   }
   assert.match(site("sw.js"), /const CACHE = "desarrollos-[0-9a-f]{7}(-local)?";/);
-  assert.ok(!fs.existsSync(path.join(ROOT, "dist", "app", "sw.js")), "dist/app no debe incluir sw.js");
-  assert.ok(fs.existsSync(path.join(ROOT, "dist", "app", "manifest.webmanifest")));
-  // Las fuentes del repo no se sellan: el sellado solo ocurre en dist/.
+  assert.ok(!fs.existsSync(path.join(out, "app", "sw.js")), "dist/app no debe incluir sw.js");
+  assert.ok(fs.existsSync(path.join(out, "app", "manifest.webmanifest")));
+  // Las fuentes del repo no se sellan: el sellado solo ocurre en la salida del build.
   assert.ok(html.includes('var APP_VERSION = "dev";'));
   assert.ok(sw.includes('const CACHE = "desarrollos-dev";'));
+  fs.rmSync(out, { recursive: true, force: true });
 });
