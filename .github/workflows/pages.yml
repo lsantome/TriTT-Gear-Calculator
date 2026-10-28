@@ -33,7 +33,7 @@ jobs:
 
       - name: Comprobaciones del sitio
         run: |
-          for f in index.html manifest.webmanifest sw.js fonts/fonts.css icons/icon-192.png icons/icon-512.png; do
+          for f in index.html manifest.webmanifest sw.js privacidad.html fonts/fonts.css icons/icon-192.png icons/icon-512.png; do
             test -s "dist/site/$f" || { echo "::error::Falta dist/site/$f"; exit 1; }
           done
           node --check dist/site/sw.js

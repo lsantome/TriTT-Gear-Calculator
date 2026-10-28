@@ -38,7 +38,7 @@ Solo se simulan platos de dentado par. Para cada uno se busca el piñón más ce
 
 ## Datos y privacidad
 
-La app no envía nada a ningún servidor ni usa analítica. Solo guarda en el dispositivo el idioma y el tema (claves `desarrollos:lang` y `desarrollos:theme` en `localStorage`). **La PWA y el APK no comparten datos**: cada uno guarda su propio idioma y tema. No hay ficheros de exportación.
+Política de privacidad pública: https://lsantome.github.io/TriTT-Gear-Calculator/privacidad.html (también la usa la ficha de Google Play). La app no envía nada a ningún servidor ni usa analítica. Solo guarda en el dispositivo el idioma y el tema (claves `desarrollos:lang` y `desarrollos:theme` en `localStorage`). **La PWA y el APK no comparten datos**: cada uno guarda su propio idioma y tema. No hay ficheros de exportación.
 
 ## Desarrollo
 
@@ -57,6 +57,8 @@ npm run android:release   # APK + AAB de release (firmados si hay credenciales)
 | Ruta | Función |
 |---|---|
 | `index.html` | Interfaz, cálculo y textos en ambos idiomas |
+| `privacidad.html` | Política de privacidad (ES/EN), solo en la web; la exige Google Play |
+| `docs/play-store/` | Textos de la ficha de Google Play, guía de declaraciones y gráficos |
 | `manifest.webmanifest`, `sw.js`, `icons/`, `fonts/` | PWA (fuentes IBM Plex y Barlow Semi Condensed, licencia SIL OFL 1.1) |
 | `scripts/` | `version.js` (sellado de versión), `build-pwa.js`, `gradle.mjs` |
 | `android/`, `capacitor.config.json` | Proyecto Android (Capacitor 8.5.3) |

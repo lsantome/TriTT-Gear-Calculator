@@ -2,6 +2,12 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y [Versionado Semántico](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Añadido
+- `privacidad.html`: política de privacidad pública en español e inglés, publicada con la PWA (exigida por Google Play).
+- `docs/play-store/`: textos de la ficha (ES/EN), guía de declaraciones y prueba cerrada de Google Play, y gráficos (icono, gráfico de funciones y capturas).
+
 ## [1.0.0] - 2026-10-23
 
 Primera versión con el estándar de repositorios y compilación.

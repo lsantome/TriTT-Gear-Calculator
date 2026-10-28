@@ -14,7 +14,7 @@ if (target !== "site" && target !== "app") {
 
 const info = getVersionInfo();
 const out = path.join(ROOT, "dist", target);
-const files = ["index.html", "manifest.webmanifest", "fonts", "icons"].concat(target === "site" ? ["sw.js"] : []);
+const files = ["index.html", "manifest.webmanifest", "fonts", "icons"].concat(target === "site" ? ["sw.js", "privacidad.html"] : []);
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
