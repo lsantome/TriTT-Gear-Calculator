@@ -8,6 +8,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 - `privacidad.html`: política de privacidad pública en español e inglés, publicada con la PWA (exigida por Google Play).
 - `docs/play-store/`: textos de la ficha (ES/EN), guía de declaraciones y prueba cerrada de Google Play, y gráficos (icono, gráfico de funciones y capturas).
 
+### Corregido
+- Pruebas: cada prueba compila en una carpeta temporal propia (`BUILD_OUT_DIR`) en vez de compartir `dist/`; al ejecutarse en paralelo se pisaban y fallaba el CI de forma intermitente, lo que impidió desplegar `privacidad.html` en Pages.
+
 ## [1.0.0] - 2026-10-23
 
 Primera versión con el estándar de repositorios y compilación.

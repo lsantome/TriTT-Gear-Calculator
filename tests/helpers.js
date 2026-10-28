@@ -23,4 +23,17 @@ function loadCalc() {
   return ctx.api;
 }
 
-module.exports = { ROOT, read, loadCalc };
+// Compila site y app en una carpeta temporal propia de la prueba (nunca en dist/: las pruebas se ejecutan en paralelo).
+function buildTo() {
+  const os = require("node:os");
+  const { execFileSync } = require("node:child_process");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "tritt-build-"));
+  for (const t of ["site", "app"]) {
+    execFileSync(process.execPath, [path.join(ROOT, "scripts", "build-pwa.js"), t], {
+      cwd: ROOT, encoding: "utf8", env: { ...process.env, BUILD_OUT_DIR: dir },
+    });
+  }
+  return dir;
+}
+
+module.exports = { ROOT, read, loadCalc, buildTo };
