@@ -22,7 +22,7 @@ Calculadora de desarrollos para triatlón y contrarreloj. Dices qué cassette mo
 
 QUÉ HACE
 • Estima la velocidad a partir de tu potencia con un modelo físico: resistencia aerodinámica (CdA, densidad del aire), rodadura (masa, Crr), eficiencia de la transmisión y circunferencia de la rueda.
-• Propone dos platos de dentado par con la mejor línea de cadena, uno grande y otro pequeño, según cuál de los dos piñones centrales del cassette prefieras usar, con una explicación de cuándo elegir cada uno.
+• Propone dos opciones alternativas de plato de dentado par con la mejor línea de cadena (opción A y opción B), según cuál de los dos piñones centrales del cassette prefieras usar, con una explicación de cuándo elegir cada una.
 • Tabla de subidas: potencia necesaria con cada piñón a tu cadencia en pendientes del 0 al 15 %. Si indicas tu FTP, muestra también el % de FTP con rangos de esfuerzo.
 • Muestra, para cada propuesta, el piñón de trabajo, la velocidad que da a tu cadencia, la cadencia necesaria para tu velocidad objetivo y una tabla con la velocidad de cada marcha.
 • Modo de plato fijo: indica el plato que ya montas y analiza solo ese, sin simular otros tamaños.
@@ -67,7 +67,7 @@ Gear calculator for triathlon and time trial. Tell it which cassette you run and
 
 WHAT IT DOES
 • Estimates speed from your power with a physical model: aerodynamic drag (CdA, air density), rolling resistance (mass, Crr), drivetrain efficiency and wheel circumference.
-• Suggests two even-toothed chainrings with the best chain line, a big one and a small one, depending on which of the cassette's two middle sprockets you prefer to use, with an explanation of when to pick each.
+• Suggests two alternative even-toothed chainring options with the best chain line (option A and option B), depending on which of the cassette's two middle sprockets you prefer to use, with an explanation of when to pick each.
 • Climbing table: power needed on each sprocket at your cadence on gradients from 0 to 15 %. If you enter your FTP it also shows % of FTP with effort ranges.
 • For each suggestion it shows the working sprocket, the speed it gives at your cadence, the cadence needed for your target speed and a table with the speed in every gear.
 • Fixed chainring mode: enter the chainring you already run and only that one is analysed, with no other sizes simulated.

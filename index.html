@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Calculadora de desarrollos</title>
-<meta name="description" content="Calculadora de desarrollos para triatlón y contrarreloj: encuentra el plato con la mejor línea de cadena para tu velocidad objetivo: una opción grande y otra pequeña, según el piñón central que prefieras.">
+<meta name="description" content="Calculadora de desarrollos para triatlón y contrarreloj: encuentra el plato con la mejor línea de cadena para tu velocidad objetivo, con dos opciones según el piñón central que prefieras.">
 <meta name="theme-color" content="#EEF1F4">
 <meta name="color-scheme" content="light dark">
 <meta name="mobile-web-app-capable" content="yes">
@@ -322,7 +322,7 @@ function better(a, b) { // a mejor que b: más centrado, y a igualdad menor erro
   return a.off < b.off || (a.off === b.off && Math.abs(a.dv) < Math.abs(b.dv));
 }
 // Solo platos de dentado par. Se proponen hasta dos platos, cada uno anclado a uno de los dos piñones centrales de la banda:
-// «high» = el piñón central mayor (da el plato más grande) y «low» = el menor (da el plato más pequeño). En cada ancla se elige el plato par
+// «high» (Opción A) = el piñón central mayor, que pide el plato mayor, y «low» (Opción B) = el menor, que pide el plato menor. En cada ancla se elige el plato par
 // que encaja con menor error de velocidad. Anclar siempre al mismo piñón hace que, al subir la potencia, el plato propuesto solo suba o se mantenga
 // (salvo en los extremos del rango de platos). Con un solo piñón central (banda de nº impar) hay una única propuesta, «one».
 // Si ninguna ancla tiene plato que encaje pero otros sí, se propone el mejor de ellos (más centrado y, a igualdad, menor error de velocidad).
@@ -386,7 +386,7 @@ function parseCogs(text) {
 var DICT = {
   es: {
     title: "Calculadora de desarrollos",
-    sub: "Triatlón y contrarreloj. Encuentra el plato con la mejor línea de cadena para tu velocidad de carrera (piñones centrales del cassette, a tu cadencia): una opción de plato grande y otra de plato pequeño.",
+    sub: "Triatlón y contrarreloj. Encuentra el plato con la mejor línea de cadena para tu velocidad de carrera (piñones centrales del cassette, a tu cadencia), con dos opciones alternativas.",
     lbl_cassette: "Cassette instalado", lbl_custom: "Dientes del cassette (11–13)",
     lbl_power: "Potencia media objetivo (W)", lbl_cad: "Cadencia media objetivo (rpm)", lbl_cda: "CdA (m²)",
     adv: "Ajustes avanzados", lbl_mass: "Masa ciclista + bici (kg)", lbl_crr: "Crr (rodadura)", lbl_rho: "Densidad del aire (kg/m³)",
@@ -399,7 +399,7 @@ var DICT = {
     lbl_vforce: "Forzar velocidad (km/h)", ph_vforce: "desde potencia", hint_vforce: "Si lo rellenas, ignora potencia y CdA",
     lbl_ftp: "FTP (W)", ph_ftp: "opcional", hint_ftp: "Con FTP, la tabla de subidas muestra también el % de FTP",
     c_title: "Subidas: coste de cada marcha a {cad} rpm", c_chain: "Plato",
-    c_sub: "Potencia necesaria (W) para mantener la velocidad de cada piñón a {cad} rpm en cada pendiente, sin viento y a velocidad constante. Con el plato grande y piñones pequeños en cuesta salen cifras inasumibles: está pensado para ver ese coste.",
+    c_sub: "Potencia necesaria (W) para mantener la velocidad de cada piñón a {cad} rpm en cada pendiente, sin viento y a velocidad constante. Con un plato grande y piñones pequeños en cuesta salen cifras inasumibles: está pensado para ver ese coste.",
     c_grade: "Pendiente", c_cog: "Piñón", c_hidden: "— = más de {w} W (oculto)", c_noftp: "Introduce tu FTP para ver también el % de FTP y el rango de esfuerzo de cada celda.",
     c_zones: "Esfuerzo típico según el % de FTP (IF)",
     z0: "Rodajes de recuperación", z1: "Entrenamiento en ritmo de resistencia",
@@ -423,21 +423,21 @@ var DICT = {
     w_norange: "El rango de platos no contiene ningún dentado par.",
     w_none: "Ningún plato par entre {min} y {max}T deja {v} km/h dentro de la banda central, a ±{tol} rpm de tu cadencia, con este cassette. El más próximo es {c}T, que cae en el piñón de {g}T ({cn} rpm para la velocidad objetivo). Amplía el rango de platos, sube la tolerancia o cambia de cassette.",
     w_anchor: "No hay opción con el piñón central de {g}T: ningún plato par entre {lo} y {hi}T encaja con él a ±{tol} rpm de tu cadencia. Amplía el rango de platos en los ajustes avanzados o sube la tolerancia.",
-    tag_high: "Plato grande", tag_low: "Plato pequeño", tag_one: "Plato propuesto",
+    tag_high: "Opción A", tag_low: "Opción B", tag_one: "Plato propuesto",
     anchor_high: "con el piñón central mayor ({g}T)", anchor_low: "con el piñón central menor ({g}T)", anchor_one: "con el piñón de {g}T",
-    expl_two: "<strong>Dos opciones para la misma velocidad.</strong> Tu cassette tiene dos piñones centrales, {lo}T y {hi}T, igual de buenos para ir a {v} km/h. Cada uno pide un plato distinto para dar casi la misma relación: con el {hi}T, un plato más grande, y con el {lo}T, uno más pequeño. Elige según el plato que tengas o prefieras montar; con cualquiera de los dos mantienes tu cadencia dentro de la tolerancia.",
+    expl_two: "<strong>Dos opciones para la misma velocidad.</strong> Tu cassette tiene dos piñones centrales, {lo}T y {hi}T, igual de buenos para ir a {v} km/h. Cada uno pide un plato distinto para dar casi la misma relación: la opción A usa el {hi}T con un plato mayor y la opción B usa el {lo}T con un plato menor. Son alternativas para un mismo plato, no una pareja de platos de un 2x: elige una según el plato que tengas o prefieras montar; con cualquiera de las dos mantienes tu cadencia dentro de la tolerancia.",
     expl_one: "<strong>Plato propuesto.</strong> Tu cassette tiene un único piñón central ({g}T) y es el que mejor encaja para ir a {v} km/h con tu cadencia.",
     chip_cad: "Cadencia fuera de tolerancia", chip_band: "Fuera de la banda central", teeth: "dientes",
     k_work: "Piñón de trabajo", k_work_v: "{g}T ({pos} de {n})", k_speed: "Velocidad a {cad} rpm", k_cad: "Cadencia para {v} km/h", k_ratio: "Relación",
     th_cog: "Piñón", th_ratio: "Relación", th_kmh: "km/h", th_delta: "Δ obj.", mark_work: "piñón de trabajo", th_chain: "Plato",
     m_sum: "Ensayo completo: velocidad (km/h) de cada plato con cada piñón a {cad} rpm", m_band: "Banda central", m_near: "Piñón más cercano a {v} km/h",
-    n_crit: "<strong>Criterio.</strong> Para cada plato se busca el piñón cuya velocidad a tu cadencia queda más cerca de la objetivo. El plato encaja si ese piñón está en la banda central y la cadencia necesaria para la velocidad objetivo queda dentro de la tolerancia (±{tol} rpm). Se proponen hasta dos platos de dentado par que encajan, cada uno apoyado en uno de los dos piñones centrales de la banda (el mayor da el plato grande y el menor, el pequeño); en cada uno se elige el de menor error de velocidad. Con un número impar de piñones en la banda solo hay un piñón central y una única propuesta. Al apoyar cada opción siempre en el mismo piñón, al subir la potencia el plato propuesto solo sube o se mantiene (salvo en los extremos del rango de platos ensayado).",
+    n_crit: "<strong>Criterio.</strong> Para cada plato se busca el piñón cuya velocidad a tu cadencia queda más cerca de la objetivo. El plato encaja si ese piñón está en la banda central y la cadencia necesaria para la velocidad objetivo queda dentro de la tolerancia (±{tol} rpm). Se proponen hasta dos platos de dentado par que encajan, cada uno apoyado en uno de los dos piñones centrales de la banda (el mayor es la opción A y el menor, la opción B); en cada uno se elige el de menor error de velocidad. Con un número impar de piñones en la banda solo hay un piñón central y una única propuesta. Al apoyar cada opción siempre en el mismo piñón, al subir la potencia el plato propuesto solo sube o se mantiene (salvo en los extremos del rango de platos ensayado).",
     n_model: "<strong>Modelo.</strong> Potencia en rueda = potencia × eficiencia = ½·ρ·CdA·v³ + Crr·m·g·v, en llano y sin viento. Con subidas o viento la velocidad media real cambia y con ella el piñón óptimo (la tabla de subidas muestra el coste en cuesta). Se asume plato único (1x) o el plato grande en un 2x.",
     n_cogs: "<strong>Dentados.</strong> Los dentados de SRAM (Red/Force 11 y 12 velocidades, XPLR 13) están contrastados con fichas del fabricante y tiendas; los de Shimano son los habituales de la serie. Comprueba el tuyo y, si difiere, usa «Personalizado»."
   },
   en: {
     title: "Gear calculator",
-    sub: "Triathlon and time trial. Finds the chainring with the best chain line for your race speed (middle sprockets of the cassette, at your cadence): one big-chainring option and one small-chainring option.",
+    sub: "Triathlon and time trial. Finds the chainring with the best chain line for your race speed (middle sprockets of the cassette, at your cadence): two alternative options.",
     lbl_cassette: "Installed cassette", lbl_custom: "Cassette teeth (11–13)",
     lbl_power: "Target average power (W)", lbl_cad: "Target average cadence (rpm)", lbl_cda: "CdA (m²)",
     adv: "Advanced settings", lbl_mass: "Rider + bike mass (kg)", lbl_crr: "Crr (rolling resistance)", lbl_rho: "Air density (kg/m³)",
@@ -450,7 +450,7 @@ var DICT = {
     lbl_vforce: "Force speed (km/h)", ph_vforce: "from power", hint_vforce: "If filled in, power and CdA are ignored",
     lbl_ftp: "FTP (W)", ph_ftp: "optional", hint_ftp: "With FTP, the climbing table also shows % of FTP",
     c_title: "Climbs: cost of each gear at {cad} rpm", c_chain: "Chainring",
-    c_sub: "Power needed (W) to hold the speed of each sprocket at {cad} rpm on each gradient, with no wind and at constant speed. Big chainring plus small sprockets uphill gives unsustainable figures: that is the point, to show the cost.",
+    c_sub: "Power needed (W) to hold the speed of each sprocket at {cad} rpm on each gradient, with no wind and at constant speed. A big chainring plus small sprockets uphill gives unsustainable figures: that is the point, to show the cost.",
     c_grade: "Gradient", c_cog: "Sprocket", c_hidden: "— = more than {w} W (hidden)", c_noftp: "Enter your FTP to also see the % of FTP and the effort range of each cell.",
     c_zones: "Typical effort by % of FTP (IF)",
     z0: "Recovery rides", z1: "Endurance-pace training rides",
@@ -474,15 +474,15 @@ var DICT = {
     w_norange: "The chainring range contains no even tooth count.",
     w_none: "No even-numbered chainring between {min} and {max}T keeps {v} km/h inside the central band within ±{tol} rpm of your cadence with this cassette. The closest is {c}T, which lands on the {g}T sprocket ({cn} rpm for the target speed). Widen the chainring range, raise the tolerance or change cassette.",
     w_anchor: "No option with the {g}T middle sprocket: no even-numbered chainring between {lo} and {hi}T fits it within ±{tol} rpm of your cadence. Widen the chainring range in the advanced settings or raise the tolerance.",
-    tag_high: "Big chainring", tag_low: "Small chainring", tag_one: "Proposed chainring",
+    tag_high: "Option A", tag_low: "Option B", tag_one: "Proposed chainring",
     anchor_high: "with the larger middle sprocket ({g}T)", anchor_low: "with the smaller middle sprocket ({g}T)", anchor_one: "with the {g}T sprocket",
-    expl_two: "<strong>Two options for the same speed.</strong> Your cassette has two middle sprockets, {lo}T and {hi}T, equally good for riding at {v} km/h. Each one needs a different chainring to give almost the same ratio: a bigger chainring with the {hi}T, a smaller one with the {lo}T. Pick the one that matches the chainring you own or prefer to fit; either keeps your cadence within tolerance.",
+    expl_two: "<strong>Two options for the same speed.</strong> Your cassette has two middle sprockets, {lo}T and {hi}T, equally good for riding at {v} km/h. Each one needs a different chainring to give almost the same ratio: option A uses the {hi}T with a bigger chainring and option B uses the {lo}T with a smaller one. They are alternatives for a single chainring, not a pair of chainrings for a 2x: pick one according to the chainring you own or prefer to fit; either keeps your cadence within tolerance.",
     expl_one: "<strong>Proposed chainring.</strong> Your cassette has a single middle sprocket ({g}T) and it is the best fit for riding at {v} km/h at your cadence.",
     chip_cad: "Cadence out of tolerance", chip_band: "Outside central band", teeth: "teeth",
     k_work: "Working sprocket", k_work_v: "{g}T ({pos} of {n})", k_speed: "Speed at {cad} rpm", k_cad: "Cadence for {v} km/h", k_ratio: "Ratio",
     th_cog: "Sprocket", th_ratio: "Ratio", th_kmh: "km/h", th_delta: "Δ target", mark_work: "working sprocket", th_chain: "Chainring",
     m_sum: "Full trial: speed (km/h) of each chainring on each sprocket at {cad} rpm", m_band: "Central band", m_near: "Sprocket closest to {v} km/h",
-    n_crit: "<strong>Criterion.</strong> For each chainring, the sprocket whose speed at your cadence is closest to the target is picked. The chainring fits if that sprocket is in the central band and the cadence needed for the target speed is within the tolerance (±{tol} rpm). Up to two even-toothed chainrings that fit are proposed, each based on one of the two middle sprockets of the band (the larger gives the big chainring, the smaller gives the small one); in each case the one with the smaller speed error is chosen. With an odd number of sprockets in the band there is a single middle sprocket and a single proposal. Because each option always rests on the same sprocket, the proposed chainring only goes up or stays the same as power rises (except at the ends of the tested chainring range).",
+    n_crit: "<strong>Criterion.</strong> For each chainring, the sprocket whose speed at your cadence is closest to the target is picked. The chainring fits if that sprocket is in the central band and the cadence needed for the target speed is within the tolerance (±{tol} rpm). Up to two even-toothed chainrings that fit are proposed, each based on one of the two middle sprockets of the band (the larger is option A and the smaller is option B); in each case the one with the smaller speed error is chosen. With an odd number of sprockets in the band there is a single middle sprocket and a single proposal. Because each option always rests on the same sprocket, the proposed chainring only goes up or stays the same as power rises (except at the ends of the tested chainring range).",
     n_model: "<strong>Model.</strong> Wheel power = power × efficiency = ½·ρ·CdA·v³ + Crr·m·g·v, on flat ground with no wind. With climbs or wind the real average speed changes, and so does the best sprocket (the climbing table shows the uphill cost). It assumes a single chainring (1x) or the big ring of a 2x.",
     n_cogs: "<strong>Tooth counts.</strong> SRAM tooth counts (Red/Force 11- and 12-speed, XPLR 13-speed) were checked against manufacturer sheets and retailers; Shimano ones are the usual counts for the series. Check yours and, if it differs, use “Custom”."
   }
