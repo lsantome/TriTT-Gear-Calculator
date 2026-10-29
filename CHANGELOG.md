@@ -9,7 +9,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 - Capturas y gráfico de funciones de la ficha de Google Play regenerados con la nueva interfaz; se añade una captura de la tabla de subidas.
 
 ### Añadido
-- Tabla «Subidas»: potencia necesaria (W) para mantener la velocidad de cada piñón a la cadencia objetivo en pendientes del 0 al 15 %, para la opción A o B (o el plato fijo). Nueva entrada opcional **FTP**: la tabla añade el % de FTP y colorea cada celda por rango de esfuerzo, con leyenda. Las celdas de más de 1000 W se ocultan.
+- Desplegable «Subidas» (cerrado por defecto): potencia necesaria (W) para mantener la velocidad de cada piñón a la cadencia objetivo en pendientes del 0 al 15 %, para la opción A o B (o el plato fijo). Nueva entrada opcional **FTP**: la tabla añade el % de FTP y colorea cada celda por rango de esfuerzo, con leyenda. Las celdas de más de 1000 W se ocultan.
 - `privacidad.html`: política de privacidad pública en español e inglés, publicada con la PWA (exigida por Google Play).
 - `docs/play-store/`: textos de la ficha (ES/EN), guía de declaraciones y prueba cerrada de Google Play, y gráficos (icono, gráfico de funciones y capturas).
 

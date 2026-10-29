@@ -139,7 +139,7 @@
   .climb td.hid { color: var(--muted); }
   .climb td.z0, .sw.z0 { background: var(--z0); } .climb td.z1, .sw.z1 { background: var(--z1); } .climb td.z2, .sw.z2 { background: var(--z2); }
   .climb td.z3, .sw.z3 { background: var(--z3); } .climb td.z4, .sw.z4 { background: var(--z4); } .climb td.z5, .sw.z5 { background: var(--z5); }
-  .climbhead { display: flex; justify-content: space-between; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 8px; }
+  .climbhead { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin: 12px 0 8px; }
   .zlist { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: .82rem; color: var(--muted); }
   .zlist li { display: flex; gap: 8px; align-items: baseline; }
   .zlist b { font-family: var(--f-mono); font-weight: 500; color: var(--ink); min-width: 6.5em; white-space: nowrap; }
@@ -567,6 +567,8 @@ function renderCard(p, ctx) {
 }
 
 var climbSel = "high";
+// Estado abierto/cerrado de los desplegables: la interfaz se reconstruye en cada cambio y, sin esto, se cerrarían al editar un campo o elegir una opción.
+var openState = { climb: false, matrix: false };
 function renderClimb(ctx) {
   var opts = ctx.fixed ? [{ label: "fixed", chain: ctx.fx.row.chain }] : ctx.res.props.map(function (p) { return { label: p.label, chain: p.row.chain }; });
   if (!opts.length || !ctx.modelOk) return "";
@@ -604,9 +606,10 @@ function renderClimb(ctx) {
   } else {
     zones = '<p class="hint">' + t("c_noftp") + "</p>";
   }
-  return '<section class="panel"><div class="climbhead"><h2>' + t("c_title", { cad: fmt(ctx.cad, 0) }) + "</h2>" + seg + "</div>" +
+  return '<details class="panel" data-key="climb"' + (openState.climb ? " open" : "") + "><summary>" + t("c_title", { cad: fmt(ctx.cad, 0) }) + "</summary>" +
+    '<div class="climbhead">' + seg + "</div>" +
     '<p class="hint">' + t("c_sub", { cad: fmt(ctx.cad, 0) }) + "</p>" +
-    '<div class="scroll"><table class="matrix climb"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" + legend + zones + "</section>";
+    '<div class="scroll"><table class="matrix climb"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" + legend + zones + "</details>";
 }
 
 function renderMatrix(ctx) {
@@ -625,7 +628,7 @@ function renderMatrix(ctx) {
     }
     body += "</tr>";
   });
-  return '<details class="panel"><summary>' + t("m_sum", { cad: fmt(ctx.cad, 0) }) + "</summary>" +
+  return '<details class="panel" data-key="matrix"' + (openState.matrix ? " open" : "") + "><summary>" + t("m_sum", { cad: fmt(ctx.cad, 0) }) + "</summary>" +
     '<div class="legend"><span><i class="sw b"></i>' + t("m_band") + '</span><span><i class="sw t"></i>' + t("m_near", { v: fmt(ctx.v, 1) }) + "</span></div>" +
     '<div class="scroll"><table class="matrix"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div></details>";
 }
@@ -709,6 +712,11 @@ function render() {
   // Un solo evento por control: si un campo también re-renderizara al perder el foco («change»), el clic en el selector de plato de la tabla de subidas se perdería (el botón se reemplaza entre pulsar y soltar).
   document.querySelectorAll("input, select").forEach(function (el) { el.addEventListener(el.tagName === "SELECT" ? "change" : "input", render); });
   document.querySelectorAll("[data-lang]").forEach(function (b) { b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); }); });
+  // «toggle» no burbujea: se escucha en captura para recordar qué desplegables están abiertos.
+  $("out").addEventListener("toggle", function (e) {
+    var k = e.target && e.target.getAttribute ? e.target.getAttribute("data-key") : null;
+    if (k && k in openState) openState[k] = e.target.open;
+  }, true);
   $("out").addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("[data-climb]") : null;
     if (!b) return;

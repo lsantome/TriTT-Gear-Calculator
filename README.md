@@ -20,7 +20,7 @@ Calculadora para triatlón y contrarreloj. Dado el cassette, la potencia media y
 2. Indica potencia media, cadencia objetivo y CdA (0,23 m² por defecto). La velocidad objetivo se calcula con el modelo de abajo.
 3. Ajusta el rango de platos a simular, o fija un plato concreto.
 4. Lee las dos tarjetas (Opción A / Opción B) y la tabla de velocidades por marcha. Son **alternativas para un mismo plato** (no una pareja de platos de un 2x) y la explicación sobre ellas dice cuándo elegir cada una.
-5. **Subidas.** La tabla «Subidas» da la potencia que cuesta mantener, a tu cadencia objetivo, la velocidad de cada piñón en pendientes del 0 al 15 % (elige Opción A u Opción B). Si indicas tu **FTP**, cada celda muestra también el % de FTP y se colorea según el esfuerzo típico de ese rango (leyenda bajo la tabla). Las celdas de más de 1000 W se ocultan.
+5. **Subidas.** El desplegable «Subidas» (cerrado por defecto, pensado para usuarios avanzados) da la potencia que cuesta mantener, a tu cadencia objetivo, la velocidad de cada piñón en pendientes del 0 al 15 % (elige Opción A u Opción B). Si indicas tu **FTP**, cada celda muestra también el % de FTP y se colorea según el esfuerzo típico de ese rango (leyenda bajo la tabla). Las celdas de más de 1000 W se ocultan.
 
 La versión instalada se ve bajo el título: `v1.0.0 · build abc1234 · 2026-10-23` (`desarrollo` si se abre `index.html` sin compilar).
 
