@@ -5,10 +5,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 ## [Sin publicar]
 
 ### Añadido
+- Tabla «Subidas»: potencia necesaria (W) para mantener la velocidad de cada piñón a la cadencia objetivo en pendientes del 0 al 15 %, para el plato Grande, Medio o Bajo (o el fijo). Nueva entrada opcional **FTP**: la tabla añade el % de FTP y colorea cada celda por rango de esfuerzo, con leyenda. Las celdas de más de 1000 W se ocultan.
 - `privacidad.html`: política de privacidad pública en español e inglés, publicada con la PWA (exigida por Google Play).
 - `docs/play-store/`: textos de la ficha (ES/EN), guía de declaraciones y prueba cerrada de Google Play, y gráficos (icono, gráfico de funciones y capturas).
 
 ### Corregido
+- Los campos de entrada ya no vuelven a calcular al perder el foco (solo al editar), lo que hacía perder el primer clic en los controles de los resultados.
 - Pruebas: cada prueba compila en una carpeta temporal propia (`BUILD_OUT_DIR`) en vez de compartir `dist/`; al ejecutarse en paralelo se pisaban y fallaba el CI de forma intermitente, lo que impidió desplegar `privacidad.html` en Pages.
 
 ## [1.0.0] - 2026-10-23

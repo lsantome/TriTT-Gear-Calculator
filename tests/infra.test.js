@@ -130,3 +130,16 @@ test("build: build:pwa y build:android-web sellan la versión; el APK no lleva s
   assert.ok(sw.includes('const CACHE = "desarrollos-dev";'));
   fs.rmSync(out, { recursive: true, force: true });
 });
+
+test("i18n: español e inglés tienen las mismas claves y toda clave usada existe", () => {
+  const a = html.indexOf("var DICT = {"), b = html.indexOf("var lang = ");
+  const ctx = {}; vm.createContext(ctx); vm.runInContext(html.slice(a, b) + ";this.D = DICT;", ctx);
+  const es = Object.keys(ctx.D.es).sort(), en = Object.keys(ctx.D.en).sort();
+  assert.deepEqual(es, en, "claves distintas entre es y en");
+  const usadas = new Set();
+  for (const m of html.matchAll(/data-i18n(?:-ph)?="([a-z0-9_]+)"/g)) usadas.add(m[1]);
+  for (const m of html.matchAll(/\bt\("([a-z0-9_]+)"\s*[,)]/g)) usadas.add(m[1]);
+  for (let i = 0; i < 6; i++) usadas.add("z" + i); // rangos de %FTP: se construyen como "z" + i
+  // Las claves que acaban en «_» son prefijos de claves compuestas en tiempo de ejecución (g_, sh_, tag_, z...).
+  for (const k of usadas) if (!k.endsWith("_")) assert.ok(es.includes(k), `falta la clave «${k}»`);
+});

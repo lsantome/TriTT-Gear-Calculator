@@ -117,3 +117,53 @@ test("presets: ascendentes, sin duplicados y con el número de piñones de su gr
     }
   }
 });
+
+// Subidas: potencia con pendiente, rangos de %FTP y tabla por piñón.
+test("powerGrade: sin pendiente coincide con powerFor y crece con la pendiente", () => {
+  for (const v of [5, 8, 11]) near(C.powerGrade(v, 0, O), C.powerFor(v, O), 1e-9, `v=${v}`);
+  let prev = 0;
+  for (const g of [0, 0.02, 0.05, 0.1, 0.15]) { const p = C.powerGrade(8, g, O); assert.ok(p > prev); prev = p; }
+});
+
+test("powerGrade: valor de referencia calculado a mano (85 kg, 8 %, 20 km/h)", () => {
+  const v = 20 / 3.6, g = 0.08, s = g / Math.sqrt(1 + g * g), c = 1 / Math.sqrt(1 + g * g);
+  const esperado = (0.5 * 1.19 * 0.23 * v ** 3 + 85 * 9.81 * v * (0.004 * c + s)) / 0.975;
+  near(C.powerGrade(v, g, O), esperado, 1e-9);
+  // Aritmética a mano: gravedad ≈ 369 W + rodadura ≈ 18 W + aire ≈ 24 W = 411 W en rueda; ÷ 0,975 ≈ 422 W en pedal.
+  near(C.powerGrade(v, g, O), 422, 1.5, "orden de magnitud");
+});
+
+test("zoneOf: límites de los rangos de %FTP (inferior incluido, superior excluido)", () => {
+  const casos = [[0, 0], [74.9, 0], [75, 1], [84.9, 1], [85, 2], [94.9, 2], [95, 3], [104.9, 3], [105, 4], [114.9, 4], [115, 5], [200, 5]];
+  for (const [pct, z] of casos) assert.equal(C.zoneOf(pct), z, `${pct} %`);
+});
+
+test("climbTable: una fila por piñón, velocidad del desarrollo y celdas por pendiente", () => {
+  const tb = C.climbTable(COGS, 52, 90, CIRC, C.CLIMB_GRADES, O, 300, C.HIDE_W);
+  assert.equal(tb.length, COGS.length);
+  assert.deepEqual(Array.from(C.CLIMB_GRADES), [0, 2, 4, 6, 8, 10, 12, 15]);
+  tb.forEach((r, i) => {
+    assert.equal(r.cog, COGS[i]);
+    near(r.v, C.speedKmh(52, COGS[i], 90, CIRC), 1e-9);
+    assert.equal(r.cells.length, C.CLIMB_GRADES.length);
+    near(r.cells[0].p, C.powerFor(r.v / 3.6, O), 1e-9, "0 % = llano");
+    near(r.cells[0].pct, r.cells[0].p / 300 * 100, 1e-9);
+    assert.equal(r.cells[0].zone, C.zoneOf(r.cells[0].pct));
+    r.cells.forEach((c, k) => { if (k) assert.ok(c.p > r.cells[k - 1].p, "la potencia crece con la pendiente"); });
+  });
+  // más piñón (más pequeño el desarrollo) = menos velocidad = menos potencia a igual pendiente
+  for (let i = 1; i < tb.length; i++) assert.ok(tb[i].cells[4].p < tb[i - 1].cells[4].p);
+});
+
+test("climbTable: oculta lo que supera el umbral y sin FTP no hay %FTP ni rango", () => {
+  const tb = C.climbTable(COGS, 56, 90, CIRC, C.CLIMB_GRADES, O, 0, 1000);
+  tb.forEach((r) => r.cells.forEach((c) => {
+    assert.equal(c.hidden, c.p > 1000);
+    assert.equal(c.pct, null);
+    assert.equal(c.zone, null);
+  }));
+  assert.ok(tb[0].cells[7].hidden, "10T, 56T, 15 % a 90 rpm debe quedar oculto");
+  assert.ok(!tb[COGS.length - 1].cells[0].hidden, "30T en llano no se oculta");
+  const sin = C.climbTable(COGS, 56, 90, CIRC, C.CLIMB_GRADES, O, 0, 0);
+  assert.ok(sin.every((r) => r.cells.every((c) => !c.hidden)), "umbral 0 = no oculta nada");
+});
