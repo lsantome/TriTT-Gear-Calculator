@@ -129,13 +129,14 @@
   .sw.b { background: var(--band); } .sw.t { background: var(--accent-soft); border-color: var(--accent); }
   .matrix td.cell-band, .matrix th.cell-band { background: var(--band); }
   .matrix td.cell-target { background: var(--accent-soft); font-weight: 600; outline: 1px solid var(--accent); outline-offset: -1px; }
-  .matrix td:first-child { font-weight: 600; background: var(--surface); position: sticky; left: 0; }
+  .matrix td:first-child { font-weight: 600; background: var(--surface); position: sticky; left: 0; z-index: 1; }
   .matrix th:first-child { background: var(--surface); position: sticky; left: 0; z-index: 1; }
   .notes { font-size: .85rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
   .notes p { margin: 0; max-width: 90ch; }
   .climb td { text-align: right; line-height: 1.25; }
   .climb td .w { display: block; }
-  .climb td .pc { display: block; font-size: .72rem; opacity: .8; }
+  /* Sin opacity: crearía un contexto de apilamiento que se pinta sobre la columna fija */
+  .climb td .pc { display: block; font-size: .72rem; color: var(--ink); color: color-mix(in srgb, var(--ink) 78%, transparent); }
   .climb td.hid { color: var(--muted); }
   .climb td.z0, .sw.z0 { background: var(--z0); } .climb td.z1, .sw.z1 { background: var(--z1); } .climb td.z2, .sw.z2 { background: var(--z2); }
   .climb td.z3, .sw.z3 { background: var(--z3); } .climb td.z4, .sw.z4 { background: var(--z4); } .climb td.z5, .sw.z5 { background: var(--z5); }
