@@ -1,7 +1,7 @@
 {
   "name": "Calculadora de desarrollos",
   "short_name": "Desarrollos",
-  "description": "Elige el plato con la mejor línea de cadena para tu velocidad objetivo, más una opción por arriba y otra por abajo. Triatlón y contrarreloj.",
+  "description": "Elige el plato con la mejor línea de cadena para tu velocidad objetivo (con dos opciones) y mira cuánto cuesta en las subidas. Triatlón y contrarreloj.",
   "lang": "es",
   "dir": "ltr",
   "start_url": "./",
