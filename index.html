@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Calculadora de desarrollos</title>
-<meta name="description" content="Calculadora de desarrollos para triatlón y contrarreloj: elige el plato con la mejor línea de cadena para tu velocidad objetivo, más una opción por arriba y otra por abajo.">
+<meta name="description" content="Calculadora de desarrollos para triatlón y contrarreloj: encuentra el plato con la mejor línea de cadena para tu velocidad objetivo: una opción grande y otra pequeña, según el piñón central que prefieras.">
 <meta name="theme-color" content="#EEF1F4">
 <meta name="color-scheme" content="light dark">
 <meta name="mobile-web-app-capable" content="yes">
@@ -19,7 +19,7 @@
 <style>
   html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
   body { margin: 0; min-height: 100vh; }
-  /* Layout: barra superior con idioma y tema, panel de entradas, franja de resultado, tres propuestas en columnas que apilan en móvil, matriz de ensayo desplegable. Claro por defecto. */
+  /* Layout: barra superior con idioma y tema, panel de entradas, franja de resultado, dos propuestas en columnas que apilan en móvil, matriz de ensayo desplegable. Claro por defecto. */
   :root {
     --bg: #EEF1F4;
     --surface: #FFFFFF;
@@ -102,11 +102,13 @@
   .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
   @media (min-width: 1100px) { .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-  .card.best { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
   .card header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 22px; }
   .tag { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; color: var(--muted); }
   .chip { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; background: var(--warn-soft); color: var(--warn); padding: 2px 8px; border-radius: 3px; }
   .cards.one { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+  @media (min-width: 700px) { .cards.two { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 820px; } }
+  .expl { margin: 0; font-size: .9rem; color: var(--muted); max-width: 90ch; }
+  .expl strong { color: var(--ink); }
   .badge { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; background: var(--accent); color: var(--accent-ink); padding: 2px 8px; border-radius: 3px; }
   .big { font-family: var(--f-mono); font-size: 2.2rem; font-weight: 500; line-height: 1; }
   .big small { font-family: var(--f-body); font-size: .85rem; color: var(--muted); margin-left: 4px; }
@@ -319,33 +321,39 @@ function nearestIdx(chain, cogs, v, cad, circ) {
 function better(a, b) { // a mejor que b: más centrado, y a igualdad menor error de velocidad
   return a.off < b.off || (a.off === b.off && Math.abs(a.dv) < Math.abs(b.dv));
 }
-// Solo platos de dentado par. Medio = el plato par que encaja con la mejor línea de cadena (piñón más centrado; a igualdad, menor error de velocidad).
-// Grande = Medio + 2 dientes y Bajo = Medio − 2 dientes.
+// Solo platos de dentado par. Se proponen hasta dos platos, cada uno anclado a uno de los dos piñones centrales de la banda:
+// «high» = el piñón central mayor (da el plato más grande) y «low» = el menor (da el plato más pequeño). En cada ancla se elige el plato par
+// que encaja con menor error de velocidad. Anclar siempre al mismo piñón hace que, al subir la potencia, el plato propuesto solo suba o se mantenga
+// (salvo en los extremos del rango de platos). Con un solo piñón central (banda de nº impar) hay una única propuesta, «one».
+// Si ninguna ancla tiene plato que encaje pero otros sí, se propone el mejor de ellos (más centrado y, a igualdad, menor error de velocidad).
 function analyze(cogs, vKmh, cad, circ, cmin, cmax, kOverride, tolRpm) {
   var band = centralBand(cogs.length, kOverride);
   var tol = tolRpm > 0 ? tolRpm : 6;
   var lo = cmin + (cmin % 2), hi = cmax - (cmax % 2);
-  var rows = [], byChain = {};
+  var rows = [];
   for (var c = lo; c <= hi; c += 2) {
     var idx = nearestIdx(c, cogs, vKmh, cad, circ);
     var vv = speedKmh(c, cogs[idx], cad, circ);
     var cadNeed = cadenceFor(vKmh, c, cogs[idx], circ);
     var inBand = idx >= band.start && idx <= band.end;
-    var r = { chain: c, idx: idx, v: vv, dv: vv - vKmh, cadNeed: cadNeed, inBand: inBand,
-              fit: inBand && Math.abs(cadNeed - cad) <= tol, off: Math.abs(idx - band.center) };
-    rows.push(r); byChain[c] = r;
+    rows.push({ chain: c, idx: idx, v: vv, dv: vv - vKmh, cadNeed: cadNeed, inBand: inBand,
+                fit: inBand && Math.abs(cadNeed - cad) <= tol, off: Math.abs(idx - band.center) });
   }
   var fits = rows.filter(function (r) { return r.fit; });
-  var props = [];
-  var bestRow = null;
-  fits.forEach(function (r) { if (!bestRow || better(r, bestRow)) bestRow = r; });
-  if (bestRow) {
-    [["large", bestRow.chain + 2], ["medium", bestRow.chain], ["small", bestRow.chain - 2]].forEach(function (e) {
-      if (byChain[e[1]]) props.push({ label: e[0], row: byChain[e[1]] });
-    });
+  var lowIdx = Math.floor(band.center), highIdx = Math.ceil(band.center);
+  var anchors = lowIdx === highIdx ? [{ label: "one", idx: lowIdx }] : [{ label: "high", idx: highIdx }, { label: "low", idx: lowIdx }];
+  var props = [], missing = [];
+  anchors.forEach(function (an) {
+    var best = null;
+    fits.forEach(function (r) { if (r.idx === an.idx && (!best || Math.abs(r.dv) < Math.abs(best.dv))) best = r; });
+    if (best) props.push({ label: an.label, row: best, anchor: an.idx }); else missing.push(an);
+  });
+  if (!props.length && fits.length) {
+    var any = null;
+    fits.forEach(function (r) { if (!any || better(r, any)) any = r; });
+    props.push({ label: "one", row: any, anchor: any.idx });
   }
-  return { band: band, rows: rows, fits: fits, props: props, bestChain: bestRow ? bestRow.chain : null,
-           tol: tol, lo: lo, hi: hi, atCeiling: !!bestRow && bestRow.chain + 2 > hi, atFloor: !!bestRow && bestRow.chain - 2 < lo };
+  return { band: band, rows: rows, fits: fits, props: props, missing: missing, tol: tol, lo: lo, hi: hi };
 }
 // Plato fijo (sin simulación): analiza solo ese plato, de cualquier dentado.
 function fixedRow(chain, cogs, vKmh, cad, circ, kOverride, tolRpm) {
@@ -378,7 +386,7 @@ function parseCogs(text) {
 var DICT = {
   es: {
     title: "Calculadora de desarrollos",
-    sub: "Triatlón y contrarreloj. Encuentra el plato con la mejor línea de cadena para tu velocidad de carrera (piñones centrales del cassette, a tu cadencia) y una opción por arriba y otra por abajo.",
+    sub: "Triatlón y contrarreloj. Encuentra el plato con la mejor línea de cadena para tu velocidad de carrera (piñones centrales del cassette, a tu cadencia): una opción de plato grande y otra de plato pequeño.",
     lbl_cassette: "Cassette instalado", lbl_custom: "Dientes del cassette (11–13)",
     lbl_power: "Potencia media objetivo (W)", lbl_cad: "Cadencia media objetivo (rpm)", lbl_cda: "CdA (m²)",
     adv: "Ajustes avanzados", lbl_mass: "Masa ciclista + bici (kg)", lbl_crr: "Crr (rodadura)", lbl_rho: "Densidad del aire (kg/m³)",
@@ -414,21 +422,22 @@ var DICT = {
     s_fit: "Platos que encajan", none: "ninguno", d_fit: "{a} de {b} ensayados",
     w_norange: "El rango de platos no contiene ningún dentado par.",
     w_none: "Ningún plato par entre {min} y {max}T deja {v} km/h dentro de la banda central, a ±{tol} rpm de tu cadencia, con este cassette. El más próximo es {c}T, que cae en el piñón de {g}T ({cn} rpm para la velocidad objetivo). Amplía el rango de platos, sube la tolerancia o cambia de cassette.",
-    w_few: "Solo se pueden mostrar {n} propuesta(s): el plato Medio queda en el borde del rango ensayado. Amplía el rango en los ajustes avanzados para ver también el plato por encima y el de por debajo.",
-    w_ceil: "No hay propuesta Grande: el plato Medio ya está a 2 dientes del máximo del rango ({hi}T). Sube el plato máximo en los ajustes avanzados.",
-    w_floor: "No hay propuesta Baja: el plato Medio ya está a 2 dientes del mínimo del rango ({lo}T). Baja el plato mínimo en los ajustes avanzados.",
-    tag_large: "Grande", tag_medium: "Medio", tag_small: "Bajo", badge_best: "Mejor línea de cadena",
+    w_anchor: "No hay opción con el piñón central de {g}T: ningún plato par entre {lo} y {hi}T encaja con él a ±{tol} rpm de tu cadencia. Amplía el rango de platos en los ajustes avanzados o sube la tolerancia.",
+    tag_high: "Plato grande", tag_low: "Plato pequeño", tag_one: "Plato propuesto",
+    anchor_high: "con el piñón central mayor ({g}T)", anchor_low: "con el piñón central menor ({g}T)", anchor_one: "con el piñón de {g}T",
+    expl_two: "<strong>Dos opciones para la misma velocidad.</strong> Tu cassette tiene dos piñones centrales, {lo}T y {hi}T, igual de buenos para ir a {v} km/h. Cada uno pide un plato distinto para dar casi la misma relación: con el {hi}T, un plato más grande, y con el {lo}T, uno más pequeño. Elige según el plato que tengas o prefieras montar; con cualquiera de los dos mantienes tu cadencia dentro de la tolerancia.",
+    expl_one: "<strong>Plato propuesto.</strong> Tu cassette tiene un único piñón central ({g}T) y es el que mejor encaja para ir a {v} km/h con tu cadencia.",
     chip_cad: "Cadencia fuera de tolerancia", chip_band: "Fuera de la banda central", teeth: "dientes",
     k_work: "Piñón de trabajo", k_work_v: "{g}T ({pos} de {n})", k_speed: "Velocidad a {cad} rpm", k_cad: "Cadencia para {v} km/h", k_ratio: "Relación",
     th_cog: "Piñón", th_ratio: "Relación", th_kmh: "km/h", th_delta: "Δ obj.", mark_work: "piñón de trabajo", th_chain: "Plato",
     m_sum: "Ensayo completo: velocidad (km/h) de cada plato con cada piñón a {cad} rpm", m_band: "Banda central", m_near: "Piñón más cercano a {v} km/h",
-    n_crit: "<strong>Criterio.</strong> Para cada plato se busca el piñón cuya velocidad a tu cadencia queda más cerca de la objetivo. El plato encaja si ese piñón está en la banda central y la cadencia necesaria para la velocidad objetivo queda dentro de la tolerancia (±{tol} rpm). «Medio» es el plato de dentado par que encaja con la mejor línea de cadena: el piñón de trabajo más centrado en el cassette (a igualdad, el que menos se aleja de la velocidad objetivo). «Grande» es +2 dientes y «Bajo» −2 dientes respecto al Medio, tanto si encajan como si no; si alguno se sale del criterio, la tarjeta lo indica.",
+    n_crit: "<strong>Criterio.</strong> Para cada plato se busca el piñón cuya velocidad a tu cadencia queda más cerca de la objetivo. El plato encaja si ese piñón está en la banda central y la cadencia necesaria para la velocidad objetivo queda dentro de la tolerancia (±{tol} rpm). Se proponen hasta dos platos de dentado par que encajan, cada uno apoyado en uno de los dos piñones centrales de la banda (el mayor da el plato grande y el menor, el pequeño); en cada uno se elige el de menor error de velocidad. Con un número impar de piñones en la banda solo hay un piñón central y una única propuesta. Al apoyar cada opción siempre en el mismo piñón, al subir la potencia el plato propuesto solo sube o se mantiene (salvo en los extremos del rango de platos ensayado).",
     n_model: "<strong>Modelo.</strong> Potencia en rueda = potencia × eficiencia = ½·ρ·CdA·v³ + Crr·m·g·v, en llano y sin viento. Con subidas o viento la velocidad media real cambia y con ella el piñón óptimo (la tabla de subidas muestra el coste en cuesta). Se asume plato único (1x) o el plato grande en un 2x.",
     n_cogs: "<strong>Dentados.</strong> Los dentados de SRAM (Red/Force 11 y 12 velocidades, XPLR 13) están contrastados con fichas del fabricante y tiendas; los de Shimano son los habituales de la serie. Comprueba el tuyo y, si difiere, usa «Personalizado»."
   },
   en: {
     title: "Gear calculator",
-    sub: "Triathlon and time trial. Finds the chainring with the best chain line for your race speed (middle sprockets of the cassette, at your cadence), plus one size up and one down.",
+    sub: "Triathlon and time trial. Finds the chainring with the best chain line for your race speed (middle sprockets of the cassette, at your cadence): one big-chainring option and one small-chainring option.",
     lbl_cassette: "Installed cassette", lbl_custom: "Cassette teeth (11–13)",
     lbl_power: "Target average power (W)", lbl_cad: "Target average cadence (rpm)", lbl_cda: "CdA (m²)",
     adv: "Advanced settings", lbl_mass: "Rider + bike mass (kg)", lbl_crr: "Crr (rolling resistance)", lbl_rho: "Air density (kg/m³)",
@@ -464,15 +473,16 @@ var DICT = {
     s_fit: "Chainrings that fit", none: "none", d_fit: "{a} of {b} tested",
     w_norange: "The chainring range contains no even tooth count.",
     w_none: "No even-numbered chainring between {min} and {max}T keeps {v} km/h inside the central band within ±{tol} rpm of your cadence with this cassette. The closest is {c}T, which lands on the {g}T sprocket ({cn} rpm for the target speed). Widen the chainring range, raise the tolerance or change cassette.",
-    w_few: "Only {n} proposal(s) can be shown: the Medium chainring sits at the edge of the tested range. Widen the range in the advanced settings to see the sizes above and below it.",
-    w_ceil: "No Large proposal: the Medium chainring is already within 2 teeth of the top of the range ({hi}T). Raise the largest chainring in the advanced settings.",
-    w_floor: "No Small proposal: the Medium chainring is already within 2 teeth of the bottom of the range ({lo}T). Lower the smallest chainring in the advanced settings.",
-    tag_large: "Large", tag_medium: "Medium", tag_small: "Small", badge_best: "Best chain line",
+    w_anchor: "No option with the {g}T middle sprocket: no even-numbered chainring between {lo} and {hi}T fits it within ±{tol} rpm of your cadence. Widen the chainring range in the advanced settings or raise the tolerance.",
+    tag_high: "Big chainring", tag_low: "Small chainring", tag_one: "Proposed chainring",
+    anchor_high: "with the larger middle sprocket ({g}T)", anchor_low: "with the smaller middle sprocket ({g}T)", anchor_one: "with the {g}T sprocket",
+    expl_two: "<strong>Two options for the same speed.</strong> Your cassette has two middle sprockets, {lo}T and {hi}T, equally good for riding at {v} km/h. Each one needs a different chainring to give almost the same ratio: a bigger chainring with the {hi}T, a smaller one with the {lo}T. Pick the one that matches the chainring you own or prefer to fit; either keeps your cadence within tolerance.",
+    expl_one: "<strong>Proposed chainring.</strong> Your cassette has a single middle sprocket ({g}T) and it is the best fit for riding at {v} km/h at your cadence.",
     chip_cad: "Cadence out of tolerance", chip_band: "Outside central band", teeth: "teeth",
     k_work: "Working sprocket", k_work_v: "{g}T ({pos} of {n})", k_speed: "Speed at {cad} rpm", k_cad: "Cadence for {v} km/h", k_ratio: "Ratio",
     th_cog: "Sprocket", th_ratio: "Ratio", th_kmh: "km/h", th_delta: "Δ target", mark_work: "working sprocket", th_chain: "Chainring",
     m_sum: "Full trial: speed (km/h) of each chainring on each sprocket at {cad} rpm", m_band: "Central band", m_near: "Sprocket closest to {v} km/h",
-    n_crit: "<strong>Criterion.</strong> For each chainring, the sprocket whose speed at your cadence is closest to the target is picked. The chainring fits if that sprocket is in the central band and the cadence needed for the target speed is within the tolerance (±{tol} rpm). “Medium” is the even-toothed chainring that fits with the best chain line: the working sprocket nearest the middle of the cassette (ties go to the smaller speed error). “Large” is +2 teeth and “Small” is −2 teeth from Medium, whether or not they fit; the card flags any that fall outside the criterion.",
+    n_crit: "<strong>Criterion.</strong> For each chainring, the sprocket whose speed at your cadence is closest to the target is picked. The chainring fits if that sprocket is in the central band and the cadence needed for the target speed is within the tolerance (±{tol} rpm). Up to two even-toothed chainrings that fit are proposed, each based on one of the two middle sprockets of the band (the larger gives the big chainring, the smaller gives the small one); in each case the one with the smaller speed error is chosen. With an odd number of sprockets in the band there is a single middle sprocket and a single proposal. Because each option always rests on the same sprocket, the proposed chainring only goes up or stays the same as power rises (except at the ends of the tested chainring range).",
     n_model: "<strong>Model.</strong> Wheel power = power × efficiency = ½·ρ·CdA·v³ + Crr·m·g·v, on flat ground with no wind. With climbs or wind the real average speed changes, and so does the best sprocket (the climbing table shows the uphill cost). It assumes a single chainring (1x) or the big ring of a 2x.",
     n_cogs: "<strong>Tooth counts.</strong> SRAM tooth counts (Red/Force 11- and 12-speed, XPLR 13-speed) were checked against manufacturer sheets and retailers; Shimano ones are the usual counts for the series. Check yours and, if it differs, use “Custom”."
   }
@@ -534,7 +544,7 @@ function findPreset(id) {
 }
 function num(id) { return parseFloat($(id).value); }
 
-function renderCard(p, ctx, isBest) {
+function renderCard(p, ctx) {
   var r = p.row, cogs = ctx.cogs, band = ctx.res.band;
   var cadNeed = cadenceFor(ctx.v, r.chain, cogs[r.idx], ctx.circ);
   var trs = "";
@@ -544,9 +554,10 @@ function renderCard(p, ctx, isBest) {
     trs += '<tr class="' + cls + '"><td>' + cogs[j] + "T" + (j === r.idx ? '<span class="mark" role="img" aria-label="' + t("mark_work") + '" title="' + t("mark_work") + '">●</span>' : "") + "</td><td>" +
       fmt(r.chain / cogs[j], 2) + "</td><td>" + fmt(s, 1) + '</td><td class="' + (j === r.idx ? "" : "neg") + '">' + sgn(s - ctx.v, 1) + "</td></tr>";
   }
-  return '<article class="card' + (isBest ? " best" : "") + '">' +
-    '<header><div><div class="tag">' + t("tag_" + p.label) + '</div><div class="big">' + r.chain + "<small>" + t("teeth") + "</small></div></div>" +
-    (ctx.fixed && r.fit ? '<span class="badge">' + t("fixed_ok") + "</span>" : isBest ? '<span class="badge">' + t("badge_best") + "</span>" : (r.fit ? "" : '<span class="chip">' + (r.inBand ? t("chip_cad") : t("chip_band")) + "</span>")) + "</header>" +
+  return '<article class="card">' +
+    '<header><div><div class="tag">' + t("tag_" + p.label) + '</div><div class="big">' + r.chain + "<small>" + t("teeth") + "</small></div>" +
+    (p.label === "fixed" ? "" : '<div class="hint">' + t("anchor_" + p.label, { g: cogs[r.idx] }) + "</div>") + "</div>" +
+    (ctx.fixed && r.fit ? '<span class="badge">' + t("fixed_ok") + "</span>" : (r.fit ? "" : '<span class="chip">' + (r.inBand ? t("chip_cad") : t("chip_band")) + "</span>")) + "</header>" +
     '<dl class="kv">' +
     "<dt>" + t("k_work") + "</dt><dd>" + t("k_work_v", { g: cogs[r.idx], pos: cogs.length - r.idx, n: cogs.length }) + "</dd>" +
     "<dt>" + t("k_speed", { cad: fmt(ctx.cad, 0) }) + "</dt><dd>" + fmt(r.v, 1) + " km/h (" + sgn(r.dv, 1) + ")</dd>" +
@@ -555,11 +566,11 @@ function renderCard(p, ctx, isBest) {
     '<div class="scroll"><table><thead><tr><th>' + t("th_cog") + "</th><th>" + t("th_ratio") + "</th><th>" + t("th_kmh") + "</th><th>" + t("th_delta") + "</th></tr></thead><tbody>" + trs + "</tbody></table></div></article>";
 }
 
-var climbSel = "medium";
+var climbSel = "high";
 function renderClimb(ctx) {
   var opts = ctx.fixed ? [{ label: "fixed", chain: ctx.fx.row.chain }] : ctx.res.props.map(function (p) { return { label: p.label, chain: p.row.chain }; });
   if (!opts.length || !ctx.modelOk) return "";
-  var sel = opts.filter(function (q) { return q.label === climbSel; })[0] || opts.filter(function (q) { return q.label === "medium"; })[0] || opts[0];
+  var sel = opts.filter(function (q) { return q.label === climbSel; })[0] || opts[0];
   var cogs = ctx.cogs, workIdx = nearestIdx(sel.chain, cogs, ctx.v, ctx.cad, ctx.circ);
   var tb = climbTable(cogs, sel.chain, ctx.cad, ctx.circ, CLIMB_GRADES, ctx.o, ctx.ftp, HIDE_W);
   var head = "<tr><th>" + t("c_cog") + "</th><th>" + t("th_kmh") + "</th>";
@@ -672,17 +683,17 @@ function render() {
     '<div class="stat"><div class="lbl">' + t("s_fit") + '</div><div><span class="v">' + (res.fits.length ? res.fits[0].chain + "–" + res.fits[res.fits.length - 1].chain : t("none")) + "</span>" + (res.fits.length ? '<span class="u">T</span>' : "") + '</div><div class="d">' + t("d_fit", { a: res.fits.length, b: res.rows.length }) + "</div></div></div>");
 
   if (fixedOn) {
-    html += '<div class="cards one">' + renderCard({ label: "fixed", row: fx.row }, ctx, false) + "</div>";
+    html += '<div class="cards one">' + renderCard({ label: "fixed", row: fx.row }, ctx) + "</div>";
   } else if (!res.rows.length) {
     html += '<div class="warn">' + t("w_norange") + "</div>";
   } else if (!res.props.length) {
     var closest = res.rows.slice().sort(function (a, b) { return a.off - b.off || Math.abs(a.dv) - Math.abs(b.dv); })[0];
     html += '<div class="warn">' + t("w_none", { min: res.lo, max: res.hi, v: fmt(v, 1), tol: fmt(res.tol, 0), c: closest.chain, g: cogs[closest.idx], cn: fmt(closest.cadNeed, 1) }) + "</div>";
   } else {
-    html += '<div class="cards">' + res.props.map(function (p) { return renderCard(p, ctx, p.row.chain === res.bestChain); }).join("") + "</div>";
-    if (res.props.length < 3) html += '<div class="warn">' + t("w_few", { n: res.props.length }) + "</div>";
-    if (res.atCeiling) html += '<div class="warn">' + t("w_ceil", { hi: res.hi }) + "</div>";
-    if (res.atFloor) html += '<div class="warn">' + t("w_floor", { lo: res.lo }) + "</div>";
+    var lowC = cogs[Math.floor(band.center)], highC = cogs[Math.ceil(band.center)];
+    html += '<p class="expl">' + (lowC !== highC ? t("expl_two", { lo: lowC, hi: highC, v: fmt(v, 1) }) : t("expl_one", { g: lowC, v: fmt(v, 1) })) + "</p>";
+    html += '<div class="cards ' + (res.props.length === 2 ? "two" : "one") + '">' + res.props.map(function (p) { return renderCard(p, ctx); }).join("") + "</div>";
+    res.missing.forEach(function (m) { html += '<div class="warn">' + t("w_anchor", { g: cogs[m.idx], lo: res.lo, hi: res.hi, tol: fmt(res.tol, 0) }) + "</div>"; });
   }
   html += renderClimb(ctx);
   if (res.rows.length) html += renderMatrix(ctx);
