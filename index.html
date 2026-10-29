@@ -72,7 +72,7 @@
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; }
   .inputs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 16px; align-items: start; }
   @media (min-width: 560px) { .inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (min-width: 860px) { .inputs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 860px) { .inputs { grid-template-columns: repeat(3, minmax(0, 1fr)); } .inputs.main { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .field.wide { grid-column: 1 / -1; }
   label, .lbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; line-height: 1.3; color: var(--muted); font-weight: 600; }
@@ -167,7 +167,7 @@
   </div>
 
   <section class="panel">
-    <div class="inputs">
+    <div class="inputs main">
       <div class="field wide">
         <label for="cassette" data-i18n="lbl_cassette"></label>
         <select id="cassette"></select>
@@ -178,8 +178,12 @@
         <span class="hint" id="customHint"></span>
       </div>
       <div class="field">
+        <label for="cad" data-i18n="lbl_cad"></label>
+        <input id="cad" type="number" inputmode="decimal" min="50" max="130" step="1" value="90">
+      </div>
+      <div class="field">
         <label for="power" data-i18n="lbl_power"></label>
-        <input id="power" type="number" inputmode="decimal" min="50" max="600" step="1" value="235">
+        <input id="power" type="number" inputmode="decimal" min="50" max="600" step="1" value="250">
       </div>
       <div class="field">
         <label for="ftp" data-i18n="lbl_ftp"></label>
@@ -187,17 +191,15 @@
         <span class="hint" data-i18n="hint_ftp"></span>
       </div>
       <div class="field">
-        <label for="cad" data-i18n="lbl_cad"></label>
-        <input id="cad" type="number" inputmode="decimal" min="50" max="130" step="1" value="90">
-      </div>
-      <div class="field">
-        <label for="cda" data-i18n="lbl_cda"></label>
-        <input id="cda" type="number" inputmode="decimal" min="0.1" max="0.6" step="0.005" value="0.23">
+        <label for="cfix" data-i18n="lbl_cfix"></label>
+        <input id="cfix" type="number" inputmode="numeric" min="20" max="90" step="1" data-i18n-ph="ph_sim">
+        <span class="hint" data-i18n="hint_cfix"></span>
       </div>
     </div>
     <details class="adv">
       <summary data-i18n="adv"></summary>
       <div class="inputs">
+        <div class="field"><label for="cda" data-i18n="lbl_cda"></label><input id="cda" type="number" inputmode="decimal" min="0.1" max="0.6" step="0.005" value="0.23"></div>
         <div class="field"><label for="mass" data-i18n="lbl_mass"></label><input id="mass" type="number" inputmode="decimal" min="40" max="200" step="0.5" value="85"></div>
         <div class="field"><label for="crr" data-i18n="lbl_crr"></label><input id="crr" type="number" inputmode="decimal" min="0.001" max="0.02" step="0.0005" value="0.004"></div>
         <div class="field"><label for="rho" data-i18n="lbl_rho"></label><input id="rho" type="number" inputmode="decimal" min="0.9" max="1.4" step="0.01" value="1.19"></div>
@@ -212,8 +214,7 @@
           </select>
         </div>
         <div class="field" id="wheelBox" hidden><label for="wheelMm" data-i18n="lbl_wheelmm"></label><input id="wheelMm" type="number" inputmode="decimal" min="1800" max="2300" step="1" value="2136"></div>
-        <div class="field"><label for="cfix" data-i18n="lbl_cfix"></label><input id="cfix" type="number" inputmode="numeric" min="20" max="90" step="1" data-i18n-ph="ph_sim"><span class="hint" data-i18n="hint_cfix"></span></div>
-        <div class="field"><label for="cmin" data-i18n="lbl_cmin"></label><input id="cmin" type="number" inputmode="numeric" min="30" max="70" step="2" value="48"></div>
+        <div class="field"><label for="cmin" data-i18n="lbl_cmin"></label><input id="cmin" type="number" inputmode="numeric" min="30" max="70" step="2" value="38"></div>
         <div class="field"><label for="cmax" data-i18n="lbl_cmax"></label><input id="cmax" type="number" inputmode="numeric" min="30" max="70" step="2" value="68"><span class="hint" data-i18n="hint_even"></span></div>
         <div class="field"><label for="kband" data-i18n="lbl_kband"></label><input id="kband" type="number" inputmode="numeric" min="1" max="13" step="1" data-i18n-ph="ph_auto"><span class="hint" data-i18n="hint_kband"></span></div>
         <div class="field"><label for="tol" data-i18n="lbl_tol"></label><input id="tol" type="number" inputmode="decimal" min="1" max="20" step="1" value="6"><span class="hint" data-i18n="hint_tol"></span></div>

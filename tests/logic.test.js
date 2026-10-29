@@ -180,16 +180,14 @@ test("climbTable: oculta lo que supera el umbral y sin FTP no hay %FTP ni rango"
 });
 
 // Monotonía: con cada ancla fija, el plato propuesto no baja al subir la potencia.
-test("analyze: con los ajustes por defecto, cada opción solo sube o se mantiene al subir la potencia (150–400 W, todos los cassettes)", () => {
+test("analyze: con los ajustes por defecto (90 rpm, platos 38–68 T), cada opción solo sube o se mantiene al subir la potencia (150–400 W, todos los cassettes)", () => {
   for (const g of C.PRESETS) for (const it of g.items) {
     if (!it.cogs) continue;
     const prev = {};
     for (let P = 150; P <= 400; P += 1) {
-      const r = C.analyze(it.cogs, C.solveSpeed(P, O) * 3.6, 90, CIRC, 48, 68, undefined, 6);
+      const r = C.analyze(it.cogs, C.solveSpeed(P, O) * 3.6, 90, CIRC, 38, 68, undefined, 6);
       for (const p of r.props) {
         if (p.label === "one") continue;
-        // Los extremos del rango (48 y 68 T) rompen la familia por diseño: se comprueba solo en el interior.
-        if (p.row.chain <= 50 || p.row.chain >= 66) { delete prev[p.label]; continue; }
         if (prev[p.label] != null) assert.ok(p.row.chain >= prev[p.label], `${it.id} ${p.label} ${P} W: ${prev[p.label]} → ${p.row.chain}`);
         prev[p.label] = p.row.chain;
       }

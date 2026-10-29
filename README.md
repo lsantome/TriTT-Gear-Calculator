@@ -17,8 +17,8 @@ Calculadora para triatlón y contrarreloj. Dado el cassette, la potencia media y
 ## Uso
 
 1. Elige el cassette (o escribe los piñones en «Personalizado»).
-2. Indica potencia media, cadencia objetivo y CdA (0,23 m² por defecto). La velocidad objetivo se calcula con el modelo de abajo.
-3. Ajusta el rango de platos a simular, o fija un plato concreto.
+2. Indica la cadencia objetivo (90 rpm por defecto) y la potencia media (250 W por defecto); opcionalmente tu FTP, para ver el % de FTP en la tabla de subidas, y un plato fijo. El CdA (0,23 m² por defecto) y el resto de parámetros del modelo están en los ajustes avanzados. La velocidad objetivo se calcula con el modelo de abajo.
+3. Ajusta el rango de platos a simular (38–68 T por defecto) en los ajustes avanzados, o fija un plato concreto en el campo «Plato fijo».
 4. Lee las dos tarjetas (Opción A / Opción B) y la tabla de velocidades por marcha. Son **alternativas para un mismo plato** (no una pareja de platos de un 2x) y la explicación sobre ellas dice cuándo elegir cada una.
 5. **Subidas.** El desplegable «Subidas» (cerrado por defecto, pensado para usuarios avanzados) da la potencia que cuesta mantener, a tu cadencia objetivo, la velocidad de cada piñón en pendientes del 0 al 15 % (elige Opción A u Opción B). Si indicas tu **FTP**, cada celda muestra también el % de FTP y se colorea según el esfuerzo típico de ese rango (leyenda bajo la tabla). Las celdas de más de 1000 W se ocultan.
 
@@ -30,7 +30,7 @@ Potencia en rueda = potencia × eficiencia = ½·ρ·CdA·v³ + Crr·m·g·v, en
 
 Solo se simulan platos de dentado par. Para cada uno se busca el piñón más cercano a la velocidad objetivo; **encaja** si ese piñón está en la banda central del cassette (un tercio de los piñones, mínimo 3) y la cadencia necesaria queda dentro de la tolerancia (±6 rpm por defecto). Con un número par de piñones en la banda central hay **dos piñones centrales** igual de buenos, y cada uno pide un plato distinto para dar casi la misma relación: la **opción A** se apoya en el piñón central mayor (y pide el plato mayor) y la **opción B** en el menor (y pide el plato menor); no son dos platos de un 2x, sino alternativas para un mismo plato; en cada uno se elige el plato par que encaja con menor error de velocidad. Si la banda tiene un número impar de piñones, hay un único piñón central y una única propuesta. La app avisa si alguna de las dos opciones no tiene plato que encaje dentro del rango ensayado.
 
-Anclar cada opción siempre al mismo piñón hace que, al subir la potencia, el plato propuesto solo suba o se mantenga. Con los ajustes por defecto (90 rpm, rango 48–68 T) esto se comprueba en las pruebas para todos los cassettes de la lista de 150 a 400 W, salvo en los extremos del rango (≤ 50 T o ≥ 66 T), donde la familia de platos puede salirse del rango; si cambias la cadencia o la tolerancia, no está garantizado.
+Anclar cada opción siempre al mismo piñón hace que, al subir la potencia, el plato propuesto solo suba o se mantenga. Con los ajustes por defecto (90 rpm, platos 38–68 T, tolerancia ±6 rpm) las pruebas lo comprueban para todos los cassettes de la lista y de 150 a 400 W. Con otras cadencias o una tolerancia más estricta no está garantizado: en los extremos del rango de platos ensayado la familia de platos puede salirse del rango (en simulaciones con 80 y 100 rpm hubo retrocesos en esos extremos).
 
 ## Limitaciones
 
