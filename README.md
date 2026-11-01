@@ -42,6 +42,8 @@ Anclar cada opción siempre al mismo piñón hace que, al subir la potencia, el 
 
 ## Datos y privacidad
 
+Idioma inicial: el elegido a mano con los botones ES/EN; si no hay elección, el primer idioma del dispositivo o navegador que la app soporte (español o inglés) y, si no, inglés.
+
 Política de privacidad pública: https://lsantome.github.io/TriTT-Gear-Calculator/privacidad.html (también la usa la ficha de Google Play). La app no envía nada a ningún servidor ni usa analítica. Solo guarda en el dispositivo el idioma y el tema (claves `desarrollos:lang` y `desarrollos:theme` en `localStorage`). **La PWA y el APK no comparten datos**: cada uno guarda su propio idioma y tema. No hay ficheros de exportación.
 
 ## Desarrollo

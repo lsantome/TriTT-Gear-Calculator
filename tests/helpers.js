@@ -17,7 +17,7 @@ function loadCalc() {
   vm.runInContext(
     html.slice(a, b) +
       ";this.api={G:G,PRESETS:PRESETS,solveSpeed:solveSpeed,powerFor:powerFor,powerGrade:powerGrade,zoneOf:zoneOf,climbTable:climbTable,CLIMB_GRADES:CLIMB_GRADES,HIDE_W:HIDE_W,speedKmh:speedKmh,cadenceFor:cadenceFor," +
-      "centralBand:centralBand,analyze:analyze,fixedRow:fixedRow,parseCogs:parseCogs};",
+      "centralBand:centralBand,analyze:analyze,fixedRow:fixedRow,parseCogs:parseCogs,pickLang:pickLang};",
     ctx
   );
   return ctx.api;

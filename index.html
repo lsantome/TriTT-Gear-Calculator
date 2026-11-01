@@ -383,6 +383,16 @@ function parseCogs(text) {
   for (var k = 1; k < arr.length; k++) if (arr[k] === arr[k - 1]) return { err: { key: "err_dup", a: arr[k] } };
   return { cogs: arr };
 }
+// Idioma inicial: lo elegido a mano (ES/EN) manda; si no, el primer idioma del dispositivo que la app soporte (es o en, cualquier región); si no hay ninguno, inglés.
+function pickLang(saved, prefs) {
+  if (saved === "es" || saved === "en") return saved;
+  var list = Array.isArray(prefs) ? prefs : (prefs ? [prefs] : []);
+  for (var i = 0; i < list.length; i++) {
+    var base = String(list[i] || "").toLowerCase().split(/[-_]/)[0];
+    if (base === "es" || base === "en") return base;
+  }
+  return "en";
+}
 // ==CALC-END==
 
 var DICT = {
@@ -706,9 +716,10 @@ function render() {
   out.innerHTML = html;
 }
 
-// Inicio: claro y español por defecto; se recuerda lo último elegido si el navegador lo permite.
+// Inicio: claro; idioma según lo elegido a mano o, en su defecto, el del dispositivo (inglés si no es español ni inglés). Se recuerda lo elegido si el navegador lo permite.
 (function () {
-  var l = load("lang"); if (l === "en") { lang = "en"; loc = "en-US"; }
+  var prefs = []; try { prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language]; } catch (e) {}
+  lang = pickLang(load("lang"), prefs); loc = lang === "en" ? "en-US" : "es-ES";
   var th = load("theme"); document.documentElement.setAttribute("data-theme", th === "dark" ? "dark" : "light");
   buildSelect(); applyI18n(); syncThemeColor(); render();
   // Un solo evento por control: si un campo también re-renderizara al perder el foco («change»), el clic en el selector de plato de la tabla de subidas se perdería (el botón se reemplaza entre pulsar y soltar).
