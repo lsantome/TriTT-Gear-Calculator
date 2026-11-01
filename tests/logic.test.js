@@ -204,3 +204,21 @@ test("analyze: 10-30 a 90 rpm, 200–300 W: platos esperados de cada opción", (
     assert.equal(r.props.find((x) => x.label === "low").row.chain, p, `${P} W pequeño`);
   }
 });
+
+test("pickLang: lo elegido a mano manda; si no, el primer idioma soportado del dispositivo; si no, inglés", () => {
+  const { pickLang } = loadCalc();
+  assert.equal(pickLang("en", ["es-ES"]), "en");
+  assert.equal(pickLang("es", ["en-US"]), "es");
+  assert.equal(pickLang(null, ["es-ES", "en-US"]), "es");
+  assert.equal(pickLang(null, ["es-MX"]), "es");
+  assert.equal(pickLang(null, ["ES"]), "es");
+  assert.equal(pickLang(null, "es_AR"), "es");
+  assert.equal(pickLang(null, ["en-GB"]), "en");
+  assert.equal(pickLang(null, ["fr-FR"]), "en");
+  assert.equal(pickLang(null, ["fr-FR", "es-ES"]), "es");
+  assert.equal(pickLang(null, ["ca-ES", "de"]), "en");
+  assert.equal(pickLang("xx", ["fr"]), "en");
+  assert.equal(pickLang(null, []), "en");
+  assert.equal(pickLang(null, undefined), "en");
+  assert.equal(pickLang(undefined, [undefined, null, "es"]), "es");
+});

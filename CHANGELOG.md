@@ -5,6 +5,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 ## [Sin publicar]
 
 ### Cambiado
+- Idioma inicial: ya no es siempre español. Si el usuario no ha elegido idioma con los botones ES/EN, la app usa el primer idioma del dispositivo que soporta (español de cualquier región o inglés) y, si no hay ninguno, inglés. Lo elegido a mano sigue prevaleciendo y se recuerda.
 - Campos principales reordenados: cassette, cadencia objetivo, potencia objetivo, FTP y plato fijo. El CdA pasa a los ajustes avanzados.
 - Valores por defecto: potencia media 250 W (antes 235 W) y plato mínimo a ensayar 38 T (antes 48 T).
 - Los tres platos Grande / Medio / Bajo (Medio ±2 dientes) pasan a **dos opciones alternativas**: «Opción A» y «Opción B», apoyadas respectivamente en el piñón central mayor y en el menor del cassette (alternativas para un mismo plato, no un 2x), con una explicación para el usuario. Así el plato propuesto ya no salta entre dos familias al subir la potencia (antes, p. ej. 56 → 50 → 58 → 52 T entre 200 y 220 W en un 10-30). Con una banda de nº impar de piñones hay una única propuesta. Cierra el pendiente del desempate de «Medio».
