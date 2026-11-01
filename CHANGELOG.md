@@ -4,6 +4,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-11-01
+
+### Añadido
+- Desplegable «Subidas» (cerrado por defecto): potencia necesaria (W) para mantener la velocidad de cada piñón a la cadencia objetivo en pendientes del 0 al 15 %, para la opción A o B (o el plato fijo). Nueva entrada opcional **FTP**: la tabla añade el % de FTP y colorea cada celda por rango de esfuerzo, con leyenda. Las celdas de más de 1000 W se ocultan.
+- `privacidad.html`: política de privacidad pública en español e inglés, publicada con la PWA (exigida por Google Play).
+- `docs/play-store/`: textos de la ficha (ES/EN), guía de declaraciones y prueba cerrada de Google Play, y gráficos (icono, gráfico de funciones y capturas).
+
 ### Cambiado
 - Idioma inicial: ya no es siempre español. Si el usuario no ha elegido idioma con los botones ES/EN, la app usa el primer idioma del dispositivo que soporta (español de cualquier región o inglés) y, si no hay ninguno, inglés. Lo elegido a mano sigue prevaleciendo y se recuerda.
 - Campos principales reordenados: cassette, cadencia objetivo, potencia objetivo, FTP y plato fijo. El CdA pasa a los ajustes avanzados.
@@ -13,13 +20,6 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ### Corregido
 - Tabla «Subidas» en móviles y pantallas estrechas: al desplazarla en horizontal, los valores de potencia y % se pintaban encima de la columna fija de tamaños de piñón. La columna fija pasa a tener `z-index` y el % se atenúa con `color-mix` en lugar de `opacity` (que creaba un contexto de apilamiento por encima de ella).
-
-### Añadido
-- Desplegable «Subidas» (cerrado por defecto): potencia necesaria (W) para mantener la velocidad de cada piñón a la cadencia objetivo en pendientes del 0 al 15 %, para la opción A o B (o el plato fijo). Nueva entrada opcional **FTP**: la tabla añade el % de FTP y colorea cada celda por rango de esfuerzo, con leyenda. Las celdas de más de 1000 W se ocultan.
-- `privacidad.html`: política de privacidad pública en español e inglés, publicada con la PWA (exigida por Google Play).
-- `docs/play-store/`: textos de la ficha (ES/EN), guía de declaraciones y prueba cerrada de Google Play, y gráficos (icono, gráfico de funciones y capturas).
-
-### Corregido
 - Los campos de entrada ya no vuelven a calcular al perder el foco (solo al editar), lo que hacía perder el primer clic en los controles de los resultados.
 - Pruebas: cada prueba compila en una carpeta temporal propia (`BUILD_OUT_DIR`) en vez de compartir `dist/`; al ejecutarse en paralelo se pisaban y fallaba el CI de forma intermitente, lo que impidió desplegar `privacidad.html` en Pages.
 
