@@ -137,9 +137,25 @@ test("i18n: español e inglés tienen las mismas claves y toda clave usada exist
   const es = Object.keys(ctx.D.es).sort(), en = Object.keys(ctx.D.en).sort();
   assert.deepEqual(es, en, "claves distintas entre es y en");
   const usadas = new Set();
-  for (const m of html.matchAll(/data-i18n(?:-ph)?="([a-z0-9_]+)"/g)) usadas.add(m[1]);
+  for (const m of html.matchAll(/data-i18n(?:-ph|-aria)?="([a-z0-9_]+)"/g)) usadas.add(m[1]);
   for (const m of html.matchAll(/\bt\("([a-z0-9_]+)"\s*[,)]/g)) usadas.add(m[1]);
   for (let i = 0; i < 6; i++) usadas.add("z" + i); // rangos de %FTP: se construyen como "z" + i
   // Las claves que acaban en «_» son prefijos de claves compuestas en tiempo de ejecución (g_, sh_, tag_, z...).
   for (const k of usadas) if (!k.endsWith("_")) assert.ok(es.includes(k), `falta la clave «${k}»`);
+});
+
+test("vista de información: icono en la cabecera, diálogo propio y textos explicativos fuera de la vista principal", () => {
+  const top = html.slice(html.indexOf('<div class="top">'), html.indexOf('<section class="panel">'));
+  assert.match(top, /id="infoBtn"[^>]*data-i18n-aria="i_open"/, "falta el botón de información en la cabecera");
+  assert.match(html, /<dialog id="info" aria-labelledby="infoTitle">/);
+  assert.match(html, /id="infoClose"[^>]*data-i18n-aria="i_close"/);
+  const a = html.indexOf("function render()"), b = html.indexOf("// Inicio:");
+  assert.ok(a > 0 && b > a);
+  const render = html.slice(a, b);
+  const info = html.slice(html.indexOf("function infoHTML()"), html.indexOf("function infoHTML()") + 900);
+  for (const k of ["n_crit", "n_model", "n_climb", "n_cogs", "n_fixed", "c_sub", "z_src"]) {
+    assert.ok(!render.includes(`t("${k}"`), `«${k}» no debe pintarse en la vista principal`);
+    assert.ok(info.includes(`t("${k}"`), `«${k}» debe estar en la vista de información`);
+  }
+  assert.ok(!html.includes('class="expl"') && !html.includes('class="notes"'), "quedan bloques de texto en la vista principal");
 });
