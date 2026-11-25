@@ -4,6 +4,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-11-25
+
+### Añadido
+- Vista aparte **«Cómo funciona»** (diálogo a pantalla completa en móvil), que se abre con un icono ⓘ en la esquina superior derecha. Se cierra con ✕, tocando fuera, con Esc o con el botón «atrás» (en Android cierra la vista en vez de salir de la app). Reúne los textos explicativos: la explicación de las opciones A/B (con tus valores), el criterio, el modelo, las subidas (descripción de la tabla y fuente de los rangos de %FTP), los dentados y, con plato fijo, su nota.
+- Ficha de Google Play: nueva captura 7 (vista de información) en español e inglés.
+
+### Cambiado
+- La vista principal ya no incluye esos textos: queda la entrada de datos, los resultados, las tarjetas y las tablas, con las pistas cortas de cada campo y la leyenda de colores de la tabla de subidas.
+- Capturas de la ficha regeneradas con la nueva interfaz.
+
+### Corregido
+- Tabla «Subidas»: la primera columna (tamaño de piñón) vuelve a alinearse a la izquierda, como su cabecera.
+
 ## [1.1.0] - 2026-11-01
 
 ### Añadido
