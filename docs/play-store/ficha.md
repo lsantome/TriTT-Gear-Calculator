@@ -106,4 +106,4 @@ La categoría se elige en *Presencia en la tienda → Configuración de la app*.
 
 ## Gráficos
 
-En `docs/play-store/graficos/`: icono 512×512, gráfico de funciones 1024×500 y 6 capturas de teléfono 1080×1920 en español (`captura-es-*`) y en inglés (`captura-en-*`): inicio, resultado, las dos opciones de plato, modo oscuro, plato fijo y subidas. Sube las de cada idioma a su traducción.
+En `docs/play-store/graficos/`: icono 512×512, gráfico de funciones 1024×500 y 7 capturas de teléfono 1080×1920 en español (`captura-es-*`) y en inglés (`captura-en-*`): inicio, resultado, las dos opciones de plato, modo oscuro, plato fijo, subidas y la vista de información («Cómo funciona», `*-7-informacion`). Sube las de cada idioma a su traducción.
